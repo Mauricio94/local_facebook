@@ -28,110 +28,140 @@
  */
 
 require_once(dirname(dirname(dirname(dirname(__FILE__)))).'/config.php');
-require_once ($CFG->dirroot.'/local/facebook/locallib.php');
+require_once($CFG->dirroot.'/local/facebook/locallib.php');
 global $DB, $USER, $CFG;
 include "facebook-php-sdk-master/src/facebook.php";
 include "htmltoinclude/javascriptindex.html";
 
-//gets all facebook information needed
-$AppID= $CFG->fbkAppID;
-$SecretID= $CFG->fbkScrID;
+// Gets all facebook information needed
+$AppID = $CFG->fbkAppID;
+$SecretID = $CFG->fbkScrID;
 $config = array(
 		'appId' => $AppID,
 		'secret' => $SecretID,
 		'grant_type' => 'client_credentials'
 );
 $facebook = new Facebook($config);
-$facebook_id= $facebook->getUser();
+$facebook_id = $facebook->getUser();
+$app_name = $CFG->fbkAppNAME;
+$app_email = $CFG->fbkemail;
+$tutorial_name = $CFG->fbktutorialsN;
+$tutorial_link = $CFG->fbktutorialsL;
+$messageurl = new moodle_url('/message/edit.php');
+$connecturl = new moodle_url('/local/facebook/connect.php');
 
-$app_name= $CFG->fbkAppNAME;
-$app_email= $CFG->fbkemail;
-$tutorial_name=$CFG->fbktutorialsN;
-$tutorial_link=$CFG->fbktutorialsL;
-$messageurl= new moodle_url('/message/edit.php');
-$connecturl= new moodle_url('/local/facebook/connect.php');
-
-//gets the UAI left side bar of the app
+// Gets the UAI left side bar of the app
 include 'htmltoinclude/sidebar.html';
-//search for the user facebook information
 
-$userfacebookinfo = $DB->get_record('facebook_user',array('facebookid'=>$facebook_id,'status'=>1));
+// Search for the user facebook information
+$userfacebookinfo = $DB->get_record('facebook_user',array(
+		'facebookid'=>$facebook_id,
+		'status'=>1
+));
 
-// if the user exist then show the app, if not tell him to connect his facebook account
-if ($userfacebookinfo != false) {
+// If the user exist then show the app, if not tell him to connect his facebook account
+if($userfacebookinfo != false) {
 	$moodleid = $userfacebookinfo->moodleid;
 	$lastvisit = $userfacebookinfo->lasttimechecked;
+	
+	// Gets the user info
 	$user_info = $DB->get_record('user', array(
 			'id'=>$moodleid
 	));
-	$usercourse = enrol_get_users_courses($moodleid);
-	echo '<div class="cuerpo"><h1>'.get_string('courses', 'local_facebook').'</h1><ul id="cursos">';
 	
-	//generates an array with all the users courses
+	$usercourse = enrol_get_users_courses($moodleid);
 	$courseidarray = array();
+	
+	// Generates an array with all the users courses
 	foreach ($usercourse as $courses){
 		$courseidarray[] = $courses->id;
 	}
 	
-	// get_in_or_equal used after in the IN ('') clause of multiple querys
-	list($sqlin, $param) = $DB->get_in_or_equal($courseidarray);
+	if(count($courseidarray)>0){
+		echo '<div class="cuerpo"><h1>'.get_string('courses', 'local_facebook').'</h1><ul id="cursos">';
 	
-	// list the 3 arrays returned from the funtion
-	list($totalresource, $totalurl, $totalpost) = get_total_notification($sqlin, $param, $lastvisit);
-	$dataarray = get_data_post_resource_link($sqlin, $param);
+		// Get_in_or_equal used after in the IN ('') clause of multiple querys
+		list($sqlin, $param) = $DB->get_in_or_equal($courseidarray);
 	
-	//foreach that generates each course square
-	foreach($usercourse as $courses){
+		// List the 3 arrays returned from the function
+		list($totalresource, $totalurl, $totalpost) = get_total_notification($sqlin, $param, $lastvisit);
+		$dataarray = get_data_post_resource_link($sqlin, $param);
+	
+		// Foreach that generates each course square
+		foreach($usercourse as $courses){
 			
-		$fullname = $courses->fullname;
-		$courseid = $courses->id;
-		$shortname = $courses->shortname;
-		$totals = 0;
-		// tests if the array has something in it
-		if (isset($totalresource[$courseid]))
-			$totals += intval($totalresource[$courseid]);
-		// tests if the array has something in it
-		if (isset($totalurl[$courseid]))
-			$totals += intval($totalurl[$courseid]);
-		// tests if the array has something in it
-		if (isset($totalpost[$courseid]))
-			$totals += intval($totalpost[$courseid]);
-		echo '<a class="inline link_curso" href="#'.$courseid.'"><li class="curso"><p class="nombre"><img src="images/lista_curso.png">'.$fullname.'</p>';
-		//if there is something to notify, then show the number of new things
-		if ($totals>0){
-			echo '<span class="numero_notificaciones">'.$totals.'</span>';
-		}
-		include "htmltoinclude/tableheaderindex.html";
-		//foreach that gives the corresponding image to the new and old items created(resource,post,forum), and its title, how upload it and its link
-		foreach($dataarray as $data){
-			if($data['course'] == $courseid){
-				$date = date("d/m/Y H:i", $data['date']);
-				echo '<tr><td><center>';
-				if($data['image'] == FACEBOOK_IMAGE_POST){
-					echo '<img src="images/post.png">';
-				}
-				elseif($data['image'] == FACEBOOK_IMAGE_RESOURCE){
-					echo '<img src="images/resource.png">';
-				}
-				elseif($data['image'] == FACEBOOK_IMAGE_LINK){
-					echo '<img src="images/link.png">';
-				}
-				echo '</center></td><td><a href="'.$data['link'].'" target="_blank">'.$data['title'].'</a>
-								</td><td style="font-size:11px"><b>'.$data ['from'].'</b></td><td>'.$date.'</td></tr>';
+			$fullname = $courses->fullname;
+			$courseid = $courses->id;
+			$shortname = $courses->shortname;
+			$totals = 0;
+			
+			// Tests if the array has something in it
+			if(isset($totalresource[$courseid])){
+				$totals += intval($totalresource[$courseid]);
 			}
+			
+			// Tests if the array has something in it
+			if(isset($totalurl[$courseid])){
+				$totals += intval($totalurl[$courseid]);
+			}
+			
+			// Tests if the array has something in it
+			if(isset($totalpost[$courseid])){
+				$totals += intval($totalpost[$courseid]);
+			}
+				
+			echo '<a class="inline link_curso" href="#'.$courseid.'"><li class="curso"><p class="nombre"><img src="images/lista_curso.png">'.$fullname.'</p>';
+			
+			// If there is something new, then show the number of new things
+			if($totals>0){
+				echo '<span class="numero_notificaciones">'.$totals.'</span>';
+			}
+			
+			include "htmltoinclude/tableheaderindex.html";
+			
+			// Foreach that gives the corresponding image to the new and old items created(resource,post,forum),its title, who upload it and its link
+			foreach($dataarray as $data){
+				if($data['course'] == $courseid){
+					$date = date("d/m/Y H:i", $data['date']);
+					echo '<tr><td><center>';
+					
+					if($data['image'] == FACEBOOK_IMAGE_POST){
+						echo '<img src="images/post.png">';
+					}
+					
+					elseif($data['image'] == FACEBOOK_IMAGE_RESOURCE){
+						echo '<img src="images/resource.png">';
+					}
+					
+					elseif($data['image'] == FACEBOOK_IMAGE_LINK){
+						echo '<img src="images/link.png">';
+					}
+					
+					echo '</center></td><td><a href="'.$data['link'].'" target="_blank">'.$data['title'].'</a>
+						  </td><td style="font-size:11px"><b>'.$data ['from'].'</b></td><td>'.$date.'</td></tr>';
+				}
+			}
+			echo '</tbody></table></div></div>';
 		}
-		echo '</tbody></table></div></div>';
+		echo '</ul></tbody></div></div>';
+		include 'htmltoinclude/spacer.html';
+		echo '<div id="overlay"></div>';
+	
+		// Updates the user last time in the app
+		$userfacebookinfo->lasttimechecked = time();
+		$DB->update_record('facebook_user', $userfacebookinfo);
 	}
-	echo '</ul></tbody></div></div>';
-	include 'htmltoinclude/spacer.html';
-	echo '<div id="overlay"></div>';
 	
-	//updates the user last time in the app
-	$userfacebookinfo->lasttimechecked = time();
-	$DB->update_record('facebook_user', $userfacebookinfo);
-	
-} else{
-	echo '<div class="cuerpo"><h1>'.get_string('existtittle', 'local_facebook').'</h1>
-		     <p>'.get_string('existtext', 'local_facebook').'<a href="'.$connecturl.'" >'.get_string('existlink', 'local_facebook').'</a></p></div>';
-	include 'htmltoinclude/spacer.html';
+	// If the user has no courses
+	else{
+		$content='<br><br>you have no courses to show';
+		echo html_writer::tag('div', $content, array('class' => 'cuerpo'));
+	}
 }
+
+// If the user in not in the DB	 
+else{
+	echo '<div class="cuerpo"><h1>'.get_string('existtittle', 'local_facebook').'</h1>
+		  <p>'.get_string('existtext', 'local_facebook').'<a href="'.$connecturl.'" >'.get_string('existlink', 'local_facebook').'</a></p></div>';
+	include 'htmltoinclude/spacer.html';
+}	
