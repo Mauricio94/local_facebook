@@ -43,80 +43,110 @@ define('FACEBOOK_IMAGE_LINK', 'link');
  * @return 3 arrays
  */
 function get_total_notification($sqlin, $param, $lastvisit){
+	
 	global  $DB;
-	//sql that counts all the new of recently modified resources
+	
+	// Resource parameters for query
 	$totalresourceparams = array(
 			'resource',
 			FACEBOOK_COURSE_MODULE_VISIBLE,
 			FACEBOOK_MODULE_VISIBLE,
 			$lastvisit
 	);
+	
+	// Merge with the params that the function brings
 	$paramsresource = array_merge($param,$totalresourceparams);
-	//Counts all the resourses since the las time the app was used
+	
+	// Sql that counts all the resourses since the last time the app was used
 	$totalresourcesql = "SELECT cm.course AS idcoursecm, COUNT(cm.module) AS countallresource
-			     FROM {course_modules} AS cm
-			     INNER JOIN {modules} AS m ON (cm.module = m.id)
-	     		     INNER JOIN {resource} AS r ON (cm.instance=r.id)
-			     WHERE cm.course $sqlin 
-			     AND m.name IN (?)
-  			     AND cm.visible = ?
- 			     AND m.visible = ?
-			     AND  r.timemodified >= ?
-			     GROUP BY cm.course";
+			     		 FROM {course_modules} AS cm
+			   			 INNER JOIN {modules} AS m ON (cm.module = m.id)
+	     		         INNER JOIN {resource} AS r ON (cm.instance=r.id)
+			   			 WHERE cm.course $sqlin 
+			     		 AND m.name IN (?)
+  			    		 AND cm.visible = ?
+ 			   			 AND m.visible = ?
+			   			 AND  r.timemodified >= ?
+			   			 GROUP BY cm.course";
+	
+	// Gets the information of the above query
+	$totalresource = $DB->get_records_sql($totalresourcesql, $paramsresource);
+	
 	$resourcepercourse = array();
-	if($totalresource = $DB->get_records_sql($totalresourcesql, $paramsresource)){
-		// makes an array that associates the course id with the counted items
-		foreach($totalresource as $totalresources){
+	
+	// If the query brings something generate an array with all the course ids
+	if($totalresource){
+		foreach($totalresource as $totalresources){	
 			$resourcepercourse[$totalresources->idcoursecm] = $totalresources->countallresource;
 		}
 	}
-	//sql that counts all the new of recently modified urls
+	
+	// Parameters of the urls
 	$totalurlparams = array(
 			'url',
 			FACEBOOK_COURSE_MODULE_VISIBLE,
 			FACEBOOK_MODULE_VISIBLE,
 			$lastvisit
 	);
+	
+	// Merge with the params that the function brings
 	$paramsurl = array_merge($param,$totalurlparams);
-	//Counts all the urls since the las time the app was used
+	
+	// Sql that counts all the urls since the last time the app was used
 	$totalurlsql = "SELECT cm.course AS idcoursecm, COUNT(cm.module) AS countallurl
-			FROM {course_modules} AS cm
-			INNER JOIN {modules} AS m ON (cm.module = m.id)
-			INNER JOIN {url} AS u ON (cm.instance=u.id)
-			WHERE cm.course $sqlin
-			AND m.name IN (?)
-			AND cm.visible = ?
-			AND m.visible = ?
-			AND  u.timemodified >= ?
-			GROUP BY cm.course";
+					FROM {course_modules} AS cm
+					INNER JOIN {modules} AS m ON (cm.module = m.id)
+					INNER JOIN {url} AS u ON (cm.instance=u.id)
+					WHERE cm.course $sqlin
+					AND m.name IN (?)
+					AND cm.visible = ?
+					AND m.visible = ?
+					AND  u.timemodified >= ?
+					GROUP BY cm.course";
+	
+	// Gets the infromation of the above query
+	$totalurl = $DB->get_records_sql($totalurlsql, $paramsurl);
+	
 	$urlpercourse = array();
-	if($totalurl = $DB->get_records_sql($totalurlsql, $paramsurl)){
-	// makes an array that associates the course id with the counted items
-		foreach($totalurl as $totalurls){
+	
+	// Makes an array that associates the course id with the counted items
+	if($totalurl){
+		foreach($totalurl as $totalurls){	
 		$urlpercourse[$totalurls->idcoursecm] = $totalurls->countallurl;
 		}
 	}
-	//sql that counts all the new of recently modified forums
+	
+	// Post parameters for query
 	$totalpostparams = array(
 			$lastvisit
 	);
+	
+	// Merge with the params that the function brings
 	$paramsallpost = array_merge($param, $totalpostparams);
-	// Counts all the posts since the last time the app was conected.
+	
+	
+	// Sql that counts all the posts since the last time the app was conected.
 	$totalpostsql = "SELECT fd.course AS idcoursefd, COUNT(fp.id) AS countallpost
-			 FROM {forum_posts} AS fp
-			 INNER JOIN {forum_discussions} AS fd ON (fp.discussion=fd.id)
-			 WHERE fd.course $sqlin 
-			 AND fp.modified > ?
-			 GROUP BY fd.course ";
+					 FROM {forum_posts} AS fp
+					 INNER JOIN {forum_discussions} AS fd ON (fp.discussion=fd.id)
+					 WHERE fd.course $sqlin 
+					 AND fp.modified > ?
+					 GROUP BY fd.course ";
+	$totalpost = $DB->get_records_sql($totalpostsql, $paramsallpost);
+	
 	$totalpostpercourse = array();
-	if($totalpost = $DB->get_records_sql($totalpostsql, $paramsallpost)){
-		// makes an array that associates the course id with the counted items		
-		foreach($totalpost as $objects){
+	
+	// Makes an array that associates the course id with the counted items
+	if($totalpost){
+		foreach($totalpost as $objects){	
 			$totalpostpercourse[$objects->idcoursefd] = $objects->countallpost;
 		}
 	}
+	
+	// Function returns
 	return array($resourcepercourse, $urlpercourse, $totalpostpercourse);
 }
+
 /**
  * Sort the records by the field inside record.
  * @param array $records        	
@@ -125,17 +155,24 @@ function get_total_notification($sqlin, $param, $lastvisit){
  * @return the records sorted
  */
 function record_sort($records, $field, $reverse = false){
+	
 	$hash = array();
-	foreach($records as $record){
+	
+	foreach($records as $record){	
 		$hash[$record[$field]] = $record;
 	}
+	
 	($reverse) ? krsort ($hash) : ksort ($hash);
 	$records = array();
-	foreach($hash as $record){
+	
+	foreach($hash as $record){	
 		$records[] = $record;
 	}
+	
+	//function returns
 	return $records;
 }
+
 /**
  * This Function gets all the posts resources and links, posted recently in the course ordered by date.
  * @param $sqlin from get_in_or_equal used in "IN ('')" clause    
@@ -143,66 +180,89 @@ function record_sort($records, $field, $reverse = false){
  * @return array
  */
 function get_data_post_resource_link($sqlin, $param){
+	
 	global $DB;
+	
+	// Parameters for post query
 	$datapostparams = array(
-			FACEBOOK_COURSE_MODULE_VISIBLE
+			FACEBOOK_COURSE_MODULE_VISIBLE,
+			'forum'
 	);
+	
+	// Merge with the params that the function brings
 	$paramspost = array_merge($param, $datapostparams);
-	//query for the posts information
+	
+	// Query for the posts information
 	$datapostsql = "SELECT fp.id AS postid, us.firstname AS firstname, us.lastname AS lastname, fp.subject AS subject,
-			fp.modified AS modified, discussions.course AS course, discussions.id AS dis_id 
-			FROM {forum_posts} AS fp
-			INNER JOIN {forum_discussions} AS discussions ON (fp.discussion=discussions.id)
-			INNER JOIN {forum} AS forum ON (forum.id=discussions.forum)
-			INNER JOIN {user} AS us ON (us.id=discussions.userid)
-			INNER JOIN {course_modules} AS cm ON (cm.instance=forum.id)
-			WHERE discussions.course $sqlin AND cm.visible = ?
-			GROUP BY fp.id";
-	//get the data from the above query
+					fp.modified AS modified, discussions.course AS course, discussions.id AS dis_id 
+					FROM {forum_posts} AS fp
+					INNER JOIN {forum_discussions} AS discussions ON (fp.discussion=discussions.id)
+					INNER JOIN {forum} AS forum ON (forum.id=discussions.forum)
+					INNER JOIN {user} AS us ON (us.id=discussions.userid)
+					INNER JOIN {course_modules} AS cm ON (cm.instance=forum.id)
+					INNER JOIN {modules} AS m ON (cm.module = m.id)
+					WHERE discussions.course $sqlin 
+					AND cm.visible = ?
+					AND m.name IN (?)
+					GROUP BY fp.id";
+	
+	// Get the data from the above query
 	$datapost = $DB->get_records_sql($datapostsql, $paramspost);
-	//parameters for resource query
+	
+	// Parameters for resource query
 	$dataresourcesparams = array(
 			'resource',
 			FACEBOOK_COURSE_MODULE_VISIBLE
 	);
+	
+	// Merge with the params that the function brings
 	$paramsresource = array_merge($param, $dataresourcesparams);
-	//query for the resource information
+	
+	// Query for the resource information
 	$dataresourcesql="SELECT cm.id AS coursemoduleid, r.id AS resourceid, r.name AS resourcename, r.timemodified, 
-			  r.course AS resourcecourse, cm.visible, cm.visibleold
-			  FROM {resource} AS r 
-                          INNER JOIN {course_modules} AS cm ON (cm.instance = r.id)
-                          INNER JOIN {modules} AS m ON (cm.module = m.id)
-			  WHERE r.course $sqlin 
-			  AND m.name IN (?) 
-			  AND cm.visible = ?
-                          GROUP BY cm.id";
-
-	//get the data from the above query
+			 		  r.course AS resourcecourse, cm.visible, cm.visibleold
+			          FROM {resource} AS r 
+                      INNER JOIN {course_modules} AS cm ON (cm.instance = r.id)
+                      INNER JOIN {modules} AS m ON (cm.module = m.id)
+			 		  WHERE r.course $sqlin 
+			 		  AND m.name IN (?) 
+			 		  AND cm.visible = ?
+                      GROUP BY cm.id";
+	
+	// Get the data from the above query
 	$dataresource = $DB->get_records_sql($dataresourcesql, $paramsresource);
-	//parameters for the link query
+	
+	// Parameters for the link query
 	$datalinkparams = array(
 			'url',
 			FACEBOOK_COURSE_MODULE_VISIBLE
 	);
+	
+	// Merge with the params that the function brings
 	$paramslink = array_merge($param, $datalinkparams);
-	//query for the link information
+	
+	// Query for the link information
 	$datalinksql="SELECT url.id AS id, url.name AS urlname, url.externalurl AS externalurl, url.timemodified AS timemodified,
 	              url.course AS urlcourse, cm.visible AS visible, cm.visibleold AS visibleold
-		      FROM {url} AS url
-                      INNER JOIN {course_modules} AS cm ON (cm.instance = url.id)
-                      INNER JOIN {modules} AS m ON (cm.module = m.id)
-		      WHERE url.course $sqlin 
-		      AND m.name IN (?)
-		      AND cm.visible = ?
-                      GROUP BY url.id";
-	//get the data from the above query
+		          FROM {url} AS url
+                  INNER JOIN {course_modules} AS cm ON (cm.instance = url.id)
+                  INNER JOIN {modules} AS m ON (cm.module = m.id)	
+                  WHERE url.course $sqlin 
+  	              AND m.name IN (?)
+	     		  AND cm.visible = ?
+                  GROUP BY url.id";
+	
+	// Get the data from the above query
 	$datalink = $DB->get_records_sql($datalinksql, $paramslink);
+	
 	$datawithpostresourcesandlink = array();
-	//foreach used to fill the array with the posts information
+	
+	// Foreach used to fill the array with the posts information
 	foreach($datapost as $post){
 		$posturl = new moodle_url('/mod/forum/discuss.php', array(
 				'd'=>$post->dis_id 
 		));
+		
 		$datawithpostresourcesandlink[] = array(
 				'image'=>FACEBOOK_IMAGE_POST,
 				'link'=>$posturl,
@@ -212,12 +272,15 @@ function get_data_post_resource_link($sqlin, $param){
 				'course'=>$post->course 
 		);
 	}
-	//foreach used to fill the array with the resource information	
+	
+	// Foreach used to fill the array with the resource information	
 	foreach($dataresource as $resource){
 		$date = date("d/m H:i", $resource->timemodified);
+		
 		$resourceurl = new moodle_url('/mod/resource/view.php', array(
 				'id'=>$resource->coursemoduleid
 		));
+		
 		if($resource->visible == FACEBOOK_COURSE_MODULE_VISIBLE && $resource->visibleold == FACEBOOK_COURSE_MODULE_VISIBLE){
 			$datawithpostresourcesandlink[] = array (
 					'image'=>FACEBOOK_IMAGE_RESOURCE,
@@ -229,9 +292,11 @@ function get_data_post_resource_link($sqlin, $param){
 			);
 		}
 	}
-	//foreach used to fill the array with the link information
+	
+	// Foreach used to fill the array with the link information
 	foreach($datalink as $link){
-		$date = date("d/m H:i", $link->timemodified);	
+		$date = date("d/m H:i", $link->timemodified);
+			
 		if($link->visible == FACEBOOK_COURSE_MODULE_VISIBLE && $link->visibleold == FACEBOOK_COURSE_MODULE_VISIBLE){
 			$datawithpostresourcesandlink[] = array(
 					'image'=>FACEBOOK_IMAGE_LINK,
@@ -243,6 +308,7 @@ function get_data_post_resource_link($sqlin, $param){
 			);
 		}
 	}
-	//returns the final array ordered by date to index.php
+	
+	// Returns the final array ordered by date to index.php
 	return record_sort($datawithpostresourcesandlink, 'date', 'true');
 }
