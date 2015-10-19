@@ -98,7 +98,7 @@ if (isset ( $user_info->status )) {
 			if (isset($accessToken)) {
 				// Logged in!
 				$_SESSION["facebook_access_token"] = $accessToken;
-				$user_data = $facebook->get ("/me?fields=link,first_name,middle_name,last_name");
+				$user_data = $facebook->get ("/me?fields=link,first_name,middle_name,last_name",$accessToken);
 				$user_profile = $user_data->getGraphUser();
 				$link = $user_profile["link"];
 				$first_name = $user_profile->getFirst_name;
@@ -120,8 +120,8 @@ if (isset ( $user_info->status )) {
 			// user ID even though the access token is invalid.
 			// In this case, we"ll get an exception, so we"ll
 			// just ask the user to login again here.
-			$login_url = $facebook->getLoginUrl();
-			echo "Please <a href='" . $login_url . "'>login.</a>";
+			$loginUrl = $helper->getLoginUrl(( dirname ( __FILE__ ) . "/connect.php"), $params );
+			echo "Please <a href='" . $login_Url . "'>login.</a>";
 			error_log ( $e->getType () );
 			error_log ( $e->getMessage () );
 		}
@@ -207,7 +207,7 @@ else {
 				$user_data = $facebook->get ("/me?fields=link,first_name,middle_name,last_name");
 				$user_profile = $user_data->getGraphUser();
 				$link = $user_profile["link"];
-				$first_name = $user_profile["first_name";
+				$first_name = $user_profile["first_name"];
 				if (isset ( $user_profile ["middle_name"] )) {
 					$middle_name = $user_profile ["middle_name"];
 				} else {

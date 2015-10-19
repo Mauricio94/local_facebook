@@ -33,10 +33,11 @@ require_once($CFG->dirroot."/local/facebook/locallib.php");
 global $DB, $USER, $CFG;
 include "htmltoinclude/javascriptindex.html";
 include "config.php";
+use Facebook\FacebookRedirectLoginHelper;
 
 // Gets all facebook information needed
 $facebook = new Facebook\Facebook($config);
-$user_data = $facebook->get ("/me");
+$helper = $facebook->getRedirectLoginHelper();
 $facebook_id = $user_data["id"];
 $app_name = $CFG->app_name;
 $app_email = $CFG->fbkemail;
@@ -45,6 +46,16 @@ $tutorial_link = $CFG->fbktutorialsL;
 $messageurl = new moodle_url('/message/edit.php');
 $connecturl = new moodle_url('/local/facebook/connect.php');
 
+	if (isset($accessToken)) {
+		// Logged in!
+		$_SESSION["facebook_access_token"] = $accessToken;
+	} elseif ($helper->getError()) {
+		// The user denied the request
+		exit;
+	}
+	
+$user_data = $facebook->get ("/me",$accessToken);
+	
 // Gets the UAI left side bar of the app
 include 'htmltoinclude/sidebar.html';
 
