@@ -25,7 +25,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once __DIR__ . "\Facebook-php-sdk-v4\src\Facebook\autoload.php";
+require_once (dirname (__FILE__) ) . "\Facebook-php-sdk-v4\src\Facebook\autoload.php";
 global $CFG;
 
 $AppID= $CFG->fbkAppID;
