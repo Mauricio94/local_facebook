@@ -25,8 +25,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once "/Facebook-php-sdk-v4/src/Facebook/autoload.php";
 global $CFG;
+require_once require_once ($CFG->dirroot . "/local/facebook/app/Facebook-php-sdk-v4/src/Facebook/autoload.php");
 
 $AppID= $CFG->fbkAppID;
 $SecretID= $CFG->fbkScrID;
