@@ -26,7 +26,7 @@
  */
 
 global $CFG;
-require_once require_once ($CFG->dirroot . "/local/facebook/app/Facebook-php-sdk-v4/src/Facebook/autoload.php");
+require_once ($CFG->dirroot . "/local/facebook/app/Facebook-php-sdk-v4/src/Facebook/autoload.php");
 
 $AppID= $CFG->fbkAppID;
 $SecretID= $CFG->fbkScrID;
