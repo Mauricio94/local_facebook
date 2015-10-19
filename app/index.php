@@ -50,7 +50,7 @@ include 'htmltoinclude/sidebar.html';
 
 // Search for the user facebook information
 $userfacebookinfo = $DB->get_record('facebook_user',array(
-		'facebookid'=>10206813897519772,
+		'facebookid'=>$facebook_id,
 		'status'=>1
 ));
 
