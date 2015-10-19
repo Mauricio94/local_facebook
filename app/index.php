@@ -24,26 +24,21 @@
  * 			   2015 Xiu-Fong Lin (xlin@alumnos.uai.cl)
  * 			   2015 Mihail Pozarski (mipozarski@alumnos.uai.cl)
  * 			   2015 Hans Jeria (hansjeria@gmail.com)
+ * 			   2015 Mauricio Meza (mameza@alumnos.uai.cl)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(dirname(dirname(dirname(__FILE__)))).'/config.php');
-require_once($CFG->dirroot.'/local/facebook/locallib.php');
+require_once(dirname(dirname(dirname(dirname(__FILE__))))."/config.php");
+require_once($CFG->dirroot."/local/facebook/locallib.php");
 global $DB, $USER, $CFG;
-include "facebook-php-sdk-master/src/facebook.php";
 include "htmltoinclude/javascriptindex.html";
+include "config.php";
 
 // Gets all facebook information needed
-$AppID = $CFG->fbkAppID;
-$SecretID = $CFG->fbkScrID;
-$config = array(
-		'appId' => $AppID,
-		'secret' => $SecretID,
-		'grant_type' => 'client_credentials'
-);
-$facebook = new Facebook($config);
-$facebook_id = $facebook->getUser();
-$app_name = $CFG->fbkAppNAME;
+$facebook = new Facebook\Facebook($config);
+$user_data = $facebook->get ("/me");
+$facebook_id = $user_data["id"];
+$app_name = $CFG->app_name;
 $app_email = $CFG->fbkemail;
 $tutorial_name = $CFG->fbktutorialsN;
 $tutorial_link = $CFG->fbktutorialsL;
@@ -55,7 +50,7 @@ include 'htmltoinclude/sidebar.html';
 
 // Search for the user facebook information
 $userfacebookinfo = $DB->get_record('facebook_user',array(
-		'facebookid'=>$facebook_id,
+		'facebookid'=>10206813897519772,
 		'status'=>1
 ));
 
