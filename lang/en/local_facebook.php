@@ -21,35 +21,37 @@
  * @package    local
  * @subpackage facebook
  * @copyright  2013 Francisco García Ralph (francisco.garcia.ralph@gmail.com)
+ * @copyright  2015 Mauricio Meza (mameza@alumnos.uai.cl)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-$string['messageprovider:notification'] = 'Notification of resources (pdf, excel, word, url, etc)';
-$string['pluginname'] = 'Course updates';
-$string['connectheading'] = 'Account information';
-$string['acountconnect'] = 'Connect account';
-$string['connectwith'] = 'You are logged in with:';
-$string['fbktablename'] = 'Name';
-$string['fbktablelastname'] = 'Last name';
-$string['profile'] = 'Profile';
-$string['back'] = 'back';
-$string['accused'] = 'This facebook account is connected with another user.';
-$string['connectquestion'] = 'Do you want to connect this account?';
-$string['connectbutton'] = 'Connect';
-$string['facebook'] = 'Facebook';
-$string['succesfullconnect'] = 'Your account it has disconnected successfully!';
-$string['notificationsettings'] = 'Notifications settings';
-$string['notificationsettingstext'] = 'If you want to configure your notifications click in';
-$string['cancelnotifications'] = 'If you dont want to recibe more notifications from webcursos to facebook click in';
-$string['disconnectaccount'] = 'Disconnect account';
-$string['tabletittle'] = 'Notifications of ';
-$string['rowtittle'] = 'Tittle';
-$string['rowfrom'] = 'From';
-$string['rowdate'] = 'Date';
-$string['conditiontittle'] = 'This aplication is not ready.';
-$string['conditiontext'] = 'We are making some testing you will recibe more information soon';
-$string['existtittle'] = 'Debes enlazar tu cuenta antes de poder usar la aplicación!!';
-$string['existtext'] = 'For disconnect you account go to ';
-$string['existlink'] = 'Here';
-$string['courses'] = 'My courses';
-$string['help'] = 'Help';
-$string['email'] = 'webcursos@uai.cl';
+$string["messageprovider:notification"] = "Notification of resources (pdf, excel, word, url, etc)";
+$string["pluginname"] = "Course update";
+$string["connectheading"] = "Account information";
+$string["acountconnect"] = "Connect account";
+$string["connectwith"] = "You are logged in with:";
+$string["fbktablename"] = "Name";
+$string["fbktablelastname"] = "Last name";
+$string["profile"] = "Profile";
+$string["back"] = "back";
+$string["accused"] = "This facebook account is connected with another user.";
+$string["connectquestion"] = "Do you want to connect this account?";
+$string["connectbutton"] = "Connect";
+$string["facebook"] = "Facebook";
+$string["succesfullconnect"] = "Your account has been successfully disconnected!";
+$string["notificationsettings"] = "Notifications settings";
+$string["notificationsettingstext"] = "If you want to configure your notifications click on";
+$string["cancelnotifications"] = "If you dont want to recibe more notifications from webcursos to facebook click on";
+$string["disconnectaccount"] = "Disconnect account";
+$string["tabletittle"] = "Notifications of ";
+$string["rowtittle"] = "Tittle";
+$string["rowfrom"] = "From";
+$string["rowdate"] = "Date";
+$string["conditiontittle"] = "This aplication is not ready.";
+$string["conditiontext"] = "We are making some testing, you will recibe more information soon";
+$string["existtittle"] = "Debes enlazar tu cuenta antes de poder usar la aplicación!!";
+$string["existtext"] = "For disconnect you account go to ";
+$string["existlink"] = "Here";
+$string["courses"] = "My courses";
+$string["help"] = "Help";
+$string["email"] = "webcursos@uai.cl";
+$string["connecttitle"] = "Conection to facebook";

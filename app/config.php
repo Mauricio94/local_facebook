@@ -21,13 +21,17 @@
  * @package    local
  * @subpackage facebook
  * @copyright  2013 Francisco García Ralph (francisco.garcia.ralph@gmail.com)
+ * @copyright  2015 Mauricio Meza (mameza@alumnos.uai.cl)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-include "facebook-php-sdk-master/src/facebook.php";
+
+require_once __DIR__ . "\Facebook-php-sdk-v4\src\Facebook\autoload.php";
+global $CFG;
+
 $AppID= $CFG->fbkAppID;
 $SecretID= $CFG->fbkScrID;
 $config = array(
-		'appId' => $AppID,
-		'secret' => $SecretID,
-		'grant_type' => 'client_credentials' );
+		"app_id" => $AppID,
+		"app_secret" => $SecretID,
+		"default_graph_version" => "v2.5" );
 
