@@ -34,14 +34,25 @@ require_once ($CFG->dirroot . "/local/facebook/forms.php");
 use Facebook\FacebookResponse;
 use Facebook\FacebookRedirectLoginHelper;
 use Facebook\FacebookRequire;
+use Facebook\FacebookSDKException;
 
 $facebook = new Facebook\Facebook ($config);
-$helper = $facebook->getRedirectLoginHelper();
-
+$app_url="https://apps.facebook.com/webcursosuai/";
 $app_name = $CFG->fbkAppNAME;
-$app_token = $CFG->fbkTkn;
+$app_id = $CFG->fbkAppID;
+$app_secret = $CFG->fbkScrID;
+$helper = $facebook->getRedirectLoginHelper();
 require_login (); // Require log in.
-                  
+
+$Client = $facebook->getClient();
+$OAuth2Client = $facebook->getOAuth2Client();
+$UrlDetectionHandler = $facebook->getUrlDetectionHandler();
+$DefaultAccessToken = $facebook->getDefaultAccessToken();
+
+
+$accessToken = $helper->getAccessToken();
+//$longLivedAccessToken = $accessToken->extend();
+
 // URL for current page
 $url = new moodle_url ( "/local/facebook/connect.php" );
 
@@ -98,8 +109,9 @@ if (isset ( $user_info->status )) {
 			if (isset($accessToken)) {
 				// Logged in!
 				$_SESSION["facebook_access_token"] = $accessToken;
-				$user_data = $facebook->get ("/me?fields=link,first_name,middle_name,last_name",$accessToken);
+				$user_data = $facebook->get ("/" . $facebook_id . "?fields=link,first_name,middle_name,last_name",$accessToken);
 				$user_profile = $user_data->getGraphUser();
+				print_r($user_profile);
 				$link = $user_profile["link"];
 				$first_name = $user_profile->getFirst_name;
 				if (isset ( $user_profile ["middle_name"] )) {
@@ -120,7 +132,7 @@ if (isset ( $user_info->status )) {
 			// user ID even though the access token is invalid.
 			// In this case, we"ll get an exception, so we"ll
 			// just ask the user to login again here.
-			$loginUrl = $helper->getLoginUrl(( dirname ( __FILE__ ) . "/connect.php"), $params );
+			$loginUrl = $helper->getLoginUrl("https://apps.facebook.com/webcursosuai/", $params );
 			echo "Please <a href='" . $login_Url . "'>login.</a>";
 			error_log ( $e->getType () );
 			error_log ( $e->getMessage () );
@@ -153,7 +165,7 @@ if (isset ( $user_info->status )) {
 				"user_friends",
 				"user_religion_politics" 
 			  ];
-	$loginUrl = $helper->getLoginUrl(( dirname ( __FILE__ ) . "/connect.php"), $params );
+	$loginUrl = $helper->getLoginUrl("https://apps.facebook.com/webcursosuai/", $params );
 	
 	echo "<br><center><a href='" . $loginUrl . "'><img src='app/images/login.jpg'width='180' height='30'></a><center>";
 } else {
@@ -246,7 +258,11 @@ else {
 	}
 }
 // if the user has the account linkd it will show his information and some other actions the user can perform.
-
+//$user_data = $facebook->get ("/me?fields=link,first_name,middle_name,last_name",$longLivedAccessToken);
+echo var_dump($Client);
+echo var_dump($OAuth2Client);
+echo var_dump($UrlDetectionHandler);
+echo var_dump($DefaultAccessToken);
 echo $OUTPUT->footer ();
 function table_generator($facebook_id, $link, $first_name, $middle_name, $last_name, $appname) {
 	$img = "<img src='https://graph.facebook.com/" . $facebook_id . "/picture?type=large'>";
