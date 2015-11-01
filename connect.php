@@ -133,7 +133,7 @@ if (isset ( $user_info->status )) {
 			// user ID even though the access token is invalid.
 			// In this case, we"ll get an exception, so we"ll
 			// just ask the user to login again here.
-			$loginUrl = $helper->getLoginUrl($app_url, $params, ",");
+			$loginUrl = $helper->getLoginUrl($app_url, $params);
 			echo "Please <a href='" . $login_Url . "'>login.</a>";
 			error_log ( $e->getType () );
 			error_log ( $e->getMessage () );
@@ -158,7 +158,7 @@ if (isset ( $user_info->status )) {
 				"user_birthday",
 				"user_friends" 
 			  ];
-	$loginUrl = $helper->getLoginUrl($app_url, $params, ",");
+	$loginUrl = $helper->getLoginUrl($app_url, $params);
 	
 	echo "<br><center><a href='" . $loginUrl . "'><img src='app/images/login.jpg'width='180' height='30'></a><center>";
 } else {
@@ -230,7 +230,7 @@ else {
 			// user ID even though the access token is invalid.
 			// In this case, we"ll get an exception, so we"ll
 			// just ask the user to login again here.
-			$loginUrl = $helper->getLoginUrl($app_url, $params, ",");
+			$loginUrl = $helper->getLoginUrl($app_url, $params);
 			echo "Please <a href='" . $login_url . "'>login.</a>";
 			error_log ( $e->getType () );
 			error_log ( $e->getMessage () );
@@ -254,7 +254,6 @@ else {
 //$user_data = $facebook->get ("/me?fields=link,first_name,middle_name,last_name",$longLivedAccessToken);
 $token = "CAAH8epIanOYBAMG2byDYZBkd16ug1eSJcTcZAHGyOeZCvbQNhnBZCBnBGA35IalO0fyLni2ZCuzWUSLJjU7ZCdcLhVDULPvXuwl96djpa0RW0nv3y4qwWhARzfb0la7VM8E9ySZBO5E0eXDEnwT0DH1PZCLX559SlMUYMCZA5ZCV9nfdrTjBqU9dTRGOzmxXqtvNU66xiDwH4wP46s4WIgSUe3";
 $user_profile = $facebook->get(	"/" . $facebook_id . "?fields=link,first_name,middle_name,last_name",$token);
-echo var_dump($user_profile);
 echo $user->getId();
 echo $OUTPUT->footer ();
 function table_generator($facebook_id, $link, $first_name, $middle_name, $last_name, $appname) {
