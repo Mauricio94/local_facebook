@@ -51,7 +51,7 @@ $UrlDetectionHandler = $facebook->getUrlDetectionHandler();
 $DefaultAccessToken = $facebook->getDefaultAccessToken();
 
 
-$accessToken = $helper->getAccessToken();
+//$accessToken = $helper->getAccessToken();
 //$longLivedAccessToken = $accessToken->extend();
 
 // URL for current page
