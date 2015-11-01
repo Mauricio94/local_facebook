@@ -155,7 +155,15 @@ if (isset ( $user_info->status )) {
 	$params = ["email",
 				"publish_actions",
 				"user_birthday",
-				"user_friends" 
+				"user_tagged_places",
+				"user_work_history",
+				"user_about_me",
+				"user_hometown",
+				"user_actions.books",
+				"user_education_history",
+				"user_likes",
+				"user_friends",
+				"user_religion_politics" 
 			  ];
 	$loginUrl = $helper->getLoginUrl($app_url, $params);
 	
