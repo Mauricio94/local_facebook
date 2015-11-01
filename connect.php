@@ -43,7 +43,6 @@ $app_name = $CFG->fbkAppNAME;
 $app_id = $CFG->fbkAppID;
 $app_secret = $CFG->fbkScrID;
 $helper = $facebook->getRedirectLoginHelper();
-$app_url="https://apps.facebook.com/webcursosuai/";
 
 require_login (); // Require log in.
 
@@ -133,6 +132,7 @@ if (isset ( $user_info->status )) {
 			// user ID even though the access token is invalid.
 			// In this case, we"ll get an exception, so we"ll
 			// just ask the user to login again here.
+			$app_url="https://apps.facebook.com/webcursosuai/";
 			$loginUrl = $helper->getLoginUrl($app_url, $params, ",");
 			echo "Please <a href='" . $login_Url . "'>login.</a>";
 			error_log ( $e->getType () );
@@ -166,7 +166,8 @@ if (isset ( $user_info->status )) {
 				"user_friends",
 				"user_religion_politics" 
 			  ];
-	$loginUrl = $helper->getLoginUrl("https://apps.facebook.com/webcursosuai/", $params , ",");
+	$app_url="https://apps.facebook.com/webcursosuai/";
+	$loginUrl = $helper->getLoginUrl($app_url, $params, ",");
 	
 	echo "<br><center><a href='" . $loginUrl . "'><img src='app/images/login.jpg'width='180' height='30'></a><center>";
 } else {
@@ -238,7 +239,8 @@ else {
 			// user ID even though the access token is invalid.
 			// In this case, we"ll get an exception, so we"ll
 			// just ask the user to login again here.
-			$login_url = $facebook->getLoginUrl ();
+			$app_url="https://apps.facebook.com/webcursosuai/";
+			$loginUrl = $helper->getLoginUrl($app_url, $params, ",");
 			echo "Please <a href='" . $login_url . "'>login.</a>";
 			error_log ( $e->getType () );
 			error_log ( $e->getMessage () );
