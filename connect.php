@@ -44,6 +44,7 @@ $app_id = $CFG->fbkAppID;
 $app_secret = $CFG->fbkScrID;
 $helper = $facebook->getRedirectLoginHelper();
 $app_url=$helper->getLoginUrl();
+$facebook_id = $user_info->facebookid;
 
 require_login (); // Require log in.
 
