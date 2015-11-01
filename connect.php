@@ -41,7 +41,8 @@ $app_name = $CFG->fbkAppNAME;
 $app_id = $CFG->fbkAppID;
 $app_secret = $CFG->fbkScrID;
 $helper = $facebook->getRedirectLoginHelper();
-$app_url="http://webcursos-d.uai.cl/local/facebook/app/index.php";
+//$app_url="http://webcursos-d.uai.cl/local/facebook/app/index.php";
+$app_url="https://apps.facebook.com/webcursosuai/";
 
 require_login (); // Require log in.
 
