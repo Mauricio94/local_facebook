@@ -35,13 +35,16 @@ use Facebook\FacebookResponse;
 use Facebook\FacebookRedirectLoginHelper;
 use Facebook\FacebookRequire;
 use Facebook\FacebookSDKException;
+use Facebook\GraphNodes\GraphUser;
 
+$user = new Facebook\GraphNodes\GraphUser();
 $facebook = new Facebook\Facebook ($config);
-$app_url="https://apps.facebook.com/webcursosuai/";
 $app_name = $CFG->fbkAppNAME;
 $app_id = $CFG->fbkAppID;
 $app_secret = $CFG->fbkScrID;
 $helper = $facebook->getRedirectLoginHelper();
+$app_url=$helper->getLoginUrl();
+
 require_login (); // Require log in.
 
 $Client = $facebook->getClient();
@@ -109,9 +112,7 @@ if (isset ( $user_info->status )) {
 			if (isset($accessToken)) {
 				// Logged in!
 				$_SESSION["facebook_access_token"] = $accessToken;
-				$user_data = $facebook->get ("/" . $facebook_id . "?fields=link,first_name,middle_name,last_name",$accessToken);
-				$user_profile = $user_data->getGraphUser();
-				print_r($user_profile);
+				$user_profile = $facebook->get("https://graph.facebook.com/" . $facebook_id . "?fields=link,first_name,middle_name,last_name");
 				$link = $user_profile["link"];
 				$first_name = $user_profile->getFirst_name;
 				if (isset ( $user_profile ["middle_name"] )) {
@@ -259,10 +260,10 @@ else {
 }
 // if the user has the account linkd it will show his information and some other actions the user can perform.
 //$user_data = $facebook->get ("/me?fields=link,first_name,middle_name,last_name",$longLivedAccessToken);
-echo var_dump($Client);
-echo var_dump($OAuth2Client);
-echo var_dump($UrlDetectionHandler);
-echo var_dump($DefaultAccessToken);
+$token = "CAAH8epIanOYBAMG2byDYZBkd16ug1eSJcTcZAHGyOeZCvbQNhnBZCBnBGA35IalO0fyLni2ZCuzWUSLJjU7ZCdcLhVDULPvXuwl96djpa0RW0nv3y4qwWhARzfb0la7VM8E9ySZBO5E0eXDEnwT0DH1PZCLX559SlMUYMCZA5ZCV9nfdrTjBqU9dTRGOzmxXqtvNU66xiDwH4wP46s4WIgSUe3";
+$user_profile = $facebook->get(	"/" . $facebook_id . "?fields=link,first_name,middle_name,last_name",$token);
+echo var_dump($user_profile);
+echo $user->getId();
 echo $OUTPUT->footer ();
 function table_generator($facebook_id, $link, $first_name, $middle_name, $last_name, $appname) {
 	$img = "<img src='https://graph.facebook.com/" . $facebook_id . "/picture?type=large'>";
