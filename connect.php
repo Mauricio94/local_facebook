@@ -42,7 +42,7 @@ $app_id = $CFG->fbkAppID;
 $app_secret = $CFG->fbkScrID;
 $helper = $facebook->getRedirectLoginHelper();
 //$app_url="http://webcursos-d.uai.cl/local/facebook/app/index.php";
-$app_url="http://apps.facebook.com/webcursosuai";
+$app_url="http://webcursos-d.uai.cl/local/facebook/connect.php";
 
 require_login (); // Require log in.
 
@@ -259,6 +259,7 @@ else {
 }
 // if the user has the account linkd it will show his information and some other actions the user can perform.
 //$user_data = $facebook->get ("/me?fields=link,first_name,middle_name,last_name",$longLivedAccessToken);
+var_dump($helper->getAccessToken());
 echo $OUTPUT->footer ();
 function table_generator($facebook_id, $link, $first_name, $middle_name, $last_name, $appname) {
 	$img = "<img src='https://graph.facebook.com/" . $facebook_id . "/picture?type=large'>";

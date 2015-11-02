@@ -33,5 +33,5 @@ $SecretID= $CFG->fbkScrID;
 $config = array(
 		"app_id" => $AppID,
 		"app_secret" => $SecretID,
-		"default_graph_version" => "v2.5" );
+		"default_graph_version" => "v2.0" );
 
