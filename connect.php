@@ -45,6 +45,21 @@ $app_url="https://webcursos-d.uai.cl/local/facebook/connect.php";
 
 require_login (); // Require log in.
 
+try {
+	if (isset($_SESSION["facebook_access_token"])) {
+		$accessToken = $_SESSION["facebook_access_token"];
+	} else {
+		$accessToken = $helper->getAccessToken();
+	}
+} catch(Facebook\Exceptions\FacebookResponseException $e) {
+	// When Graph returns an error
+	echo "Graph returned an error: " . $e->getMessage();
+	exit;
+} catch(Facebook\Exceptions\FacebookSDKException $e) {
+	// When validation fails or other local issues
+	echo "Facebook SDK returned an error: " . $e->getMessage();
+	exit;
+}
 
 //$accessToken = $helper->getAccessToken();
 //$longLivedAccessToken = $accessToken->extend();
