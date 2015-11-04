@@ -115,12 +115,11 @@ if (isset ( $user_info->status )) {
 		// We have a user ID, so probably a logged in user.
 		// If not, we"ll get an exception, which we handle below.
 		try {
-			$accessToken = $helper->getAccessToken();
-			
-			if (isset($accessToken)) {
+			if (isset($_SESSION["facebook_access_token"])) {
 				// Logged in!
+				$accessToken = $_SESSION["facebook_access_token"];
 				$_SESSION["facebook_access_token"] = $accessToken;
-				$user_profile = $facebook->get("https://graph.facebook.com/" . $facebook_id . "?fields=link,first_name,middle_name,last_name");
+				$user_profile = $facebook->get("https://graph.facebook.com/" . $facebook_id . "?fields=link,first_name,middle_name,last_name",$accessToken);
 				$link = $user_profile["link"];
 				$first_name = $user_profile->getFirst_name;
 				if (isset ( $user_profile ["middle_name"] )) {
@@ -268,6 +267,8 @@ else {
 }
 // if the user has the account linkd it will show his information and some other actions the user can perform.
 //$user_data = $facebook->get ("/me?fields=link,first_name,middle_name,last_name",$longLivedAccessToken);
+$user_profile = $facebook->get("https://graph.facebook.com/" . $facebook_id . "?fields=link,first_name,middle_name,last_name",$accessToken);
+var_dump($user_profile);
 echo $OUTPUT->footer ();
 function table_generator($facebook_id, $link, $first_name, $middle_name, $last_name, $appname) {
 	$img = "<img src='https://graph.facebook.com/" . $facebook_id . "/picture?type=large'>";
