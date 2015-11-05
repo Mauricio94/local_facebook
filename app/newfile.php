@@ -1,5 +1,5 @@
 <?php
-require_once (dirname(dirname(dirname(dirname(__FILE__))))."/config.php");
+require_once(dirname(dirname(dirname(dirname(__FILE__))))."/config.php");
 global $CFG;
 require_once ($CFG->dirroot . "/local/facebook/app/facebook-php-sdk-v4/src/Facebook/autoload.php");
 
