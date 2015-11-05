@@ -193,13 +193,8 @@ if (isset ( $user_info->status )) {
 	if ($connect != NULL) {
 		
 		// If the user wants to link an account that was already linked, but was unlinked that means with status 0
-		$profile_request = $facebook->get('/me?fields=name,first_name,last_name,link');
-		$profile = $profile_request->getGraphNode()->asArray();
-		$facebook_id = $profile["id"];
-		echo $facebook_id;
-		$user_inactive = $DB->get_record ( "facebook_user", array (
+				$user_inactive = $DB->get_record ( "facebook_user", array (
 				"moodleid" => $USER->id,
-				"facebookid" => $facebook_id,
 				"status" => 0 
 		) );
 		
@@ -212,7 +207,10 @@ if (isset ( $user_info->status )) {
 			echo "<script>location.reload();</script>";
 		}  // If the user wants to link a account that was never linked before.
 		else {
-						
+			$profile_request = $facebook->get('/me?fields=name,first_name,last_name,link');
+			$profile = $profile_request->getGraphNode()->asArray();
+			$facebook_id = $profile["id"];
+			
 			$record = new stdClass ();
 			$record->moodleid = $USER->id;
 			$record->facebookid = $facebook_id;
@@ -284,7 +282,7 @@ echo $OUTPUT->footer ();
 function table_generator($facebook_id, $link, $first_name, $middle_name, $last_name, $appname) {
 	$img = "<img src='https://graph.facebook.com/" . $facebook_id . "/picture?type=large'>";
 	$table2 = new html_table ();
-$table = new html_table();
+	$table = new html_table();
 	$table->data[]= array(
 						'',
 						''
@@ -319,7 +317,7 @@ $table = new html_table();
 		
 	}
 	$table2->data[]=array(
-						'<img src="https://graph.facebook.com/'.$username.'/picture?type=large">',
+						'<img src="https://graph.facebook.com/'.$facebook_id.'/picture?type=large">',
 						html_writer::table($table)
 	);
 	echo html_writer::table($table2);
