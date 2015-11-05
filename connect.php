@@ -169,24 +169,6 @@ if (isset ( $user_info->status )) {
 		$button = new buttons ();
 		$button->display ();
 	}
-} else if ($facebook_id == 0) { // If the user hasn"t accepted the permissions
-	echo $OUTPUT->heading ( get_string ( "acountconnect", "local_facebook" ) );
-	$params = [	"email",
-				"publish_actions",
-				"user_birthday",
-				"user_tagged_places",
-				"user_work_history",
-				"user_about_me",
-				"user_hometown",
-				"user_actions.books",
-				"user_education_history",
-				"user_likes",
-				"user_friends",
-				"user_religion_politics" 
-			  ];
-	$loginUrl = $helper->getLoginUrl($app_url, $params);
-	
-	echo "<br><center><a href='" . $loginUrl . "'><img src='app/images/login.jpg'width='180' height='30'></a><center>";
 } else {
 	
 	// If he clicked the link button.
@@ -223,56 +205,24 @@ if (isset ( $user_info->status )) {
 			echo "<script>location.reload();</script>";
 		}
 	} else {
-		
 		echo $OUTPUT->heading ( get_string ( "acountconnect", "local_facebook" ) );
+		$params = [	"email",
+				"publish_actions",
+				"user_birthday",
+				"user_tagged_places",
+				"user_work_history",
+				"user_about_me",
+				"user_hometown",
+				"user_actions.books",
+				"user_education_history",
+				"user_likes",
+				"user_friends",
+				"user_religion_politics"
+		];
+		$loginUrl = $helper->getLoginUrl($app_url, $params);
 		
-		echo $OUTPUT->heading ( get_string ( "connectwith", "local_facebook" ), 5 );
-		// Facebook code to search the user information.
-		// We have a user ID, so probably a logged in user.
-		// If not, we"ll get an exception, which we handle below.
-		try {
-			if (isset($accessToken)) {
-				// Logged in!
-				$profile_request = $facebook->get('/me?fields=name,first_name,middle_name,last_name,link');
-				$profile = $profile_request->getGraphNode()->asArray();
-				$facebook_id = $profile["id"];
-				$link = $profile["link"];
-				$first_name = $profile["first_name"];
-				if (isset ( $profile ["middle_name"] )) {
-					$middle_name = $profile ["middle_name"];
-				} else {
-					$middle_name = "";
-				}
-				$last_name = $profile ["last_name"];
-				// Now you can redirect to another page and use the
-				// access token from $_SESSION['facebook_access_token']
-			} elseif ($helper->getError()) {
-				// The user denied the request
-				exit;
-			} 
-		}catch ( FacebookApiException $e ) {
-			// If the user is logged out, you can have a
-			// user ID even though the access token is invalid.
-			// In this case, we"ll get an exception, so we"ll
-			// just ask the user to login again here.
-			$loginUrl = $helper->getLoginUrl($app_url, $params);
-			echo "Please <a href='" . $login_url . "'>login.</a>";
-			error_log ( $e->getType () );
-			error_log ( $e->getMessage () );
-		}
+		echo "<br><center><a href='" . $loginUrl . "'><img src='app/images/login.jpg'width='180' height='30'></a><center>";
 		
-		$table = table_generator ( $facebook_id, $link, $first_name, $middle_name, $last_name, null );
-		// Look if the account was already linked
-		$duplicate = $DB->get_record ( "facebook_user", array (
-				"facebookid" => $facebook_id,
-				"status" => 1 
-		) );
-		// if it isn"t linked it will return false, if the status is 0 someone already linked it but it is not active.
-		
-		$button = new connect ( null, array (
-				"duplicate" => $duplicate 
-		) );
-		$button->display ();
 	}
 }
 // if the user has the account linkd it will show his information and some other actions the user can perform.
