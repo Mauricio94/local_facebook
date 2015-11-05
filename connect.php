@@ -181,7 +181,7 @@ if (isset ( $user_info->status )) {
 		) );
 		
 		if (isset($user_inactive)) {
-			
+			var_dump($user_inactive);
 			$user_inactive->timemodified = $time;
 			$user_inactive->status = "1";
 			$user_inactive->lasttimechecked = $time;
@@ -229,7 +229,6 @@ if (isset ( $user_info->status )) {
 echo $OUTPUT->footer ();
 function table_generator($facebook_id, $link, $first_name, $middle_name, $last_name, $appname) {
 	$img = "<img src='https://graph.facebook.com/" . $facebook_id . "/picture?type=large'>";
-	$table2 = new html_table ();
 	$table = new html_table();
 	$table->data[]= array(
 						'',
@@ -237,15 +236,7 @@ function table_generator($facebook_id, $link, $first_name, $middle_name, $last_n
 	);
 	$table->data[]= array(
 						get_string('fbktablename', 'local_facebook'),
-						$first_name
-	);
-	$table->data[]= array(
-						'', 
-						''
-	);
-	$table->data[]= array(
-						get_string('fbktablelastname', 'local_facebook'), 
-						$middle_name.' '.$last_name
+						$first_name." ".$middle_name.' '.$last_name
 	);
 	$table->data[]= array(
 						'',
