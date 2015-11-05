@@ -193,7 +193,10 @@ if (isset ( $user_info->status )) {
 	if ($connect != NULL) {
 		
 		// If the user wants to link an account that was already linked, but was unlinked that means with status 0
-		
+		$profile_request = $facebook->get('/me?fields=name,first_name,last_name,link');
+		$profile = $profile_request->getGraphNode()->asArray();
+		$facebook_id = $profile["id"];
+		echo $facebook_id;
 		$user_inactive = $DB->get_record ( "facebook_user", array (
 				"moodleid" => $USER->id,
 				"facebookid" => $facebook_id,
