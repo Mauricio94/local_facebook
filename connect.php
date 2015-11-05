@@ -129,7 +129,7 @@ if (isset ( $user_info->status )) {
 		try {
 			if (isset($accessToken)) {
 				// Logged in!
-				$profile_request = $facebook->get('/me?fields=name,first_name,last_name,link');
+				$profile_request = $facebook->get('/me?fields=name,first_name,middle_name,last_name,link');
 				$profile = $profile_request->getGraphNode()->asArray();
 				$link = $profile["link"];
 				$first_name = $profile["first_name"];
@@ -207,7 +207,7 @@ if (isset ( $user_info->status )) {
 			echo "<script>location.reload();</script>";
 		}  // If the user wants to link a account that was never linked before.
 		else {
-			$profile_request = $facebook->get('/me?fields=name,first_name,last_name,link');
+			$profile_request = $facebook->get('/me?fields=name,first_name,middle_name,last_name,link');
 			$profile = $profile_request->getGraphNode()->asArray();
 			$facebook_id = $profile["id"];
 			
@@ -233,7 +233,7 @@ if (isset ( $user_info->status )) {
 		try {
 			if (isset($accessToken)) {
 				// Logged in!
-				$profile_request = $facebook->get('/me?fields=name,first_name,last_name,link');
+				$profile_request = $facebook->get('/me?fields=name,first_name,middle_name,last_name,link');
 				$profile = $profile_request->getGraphNode()->asArray();
 				$facebook_id = $profile["id"];
 				$link = $profile["link"];
