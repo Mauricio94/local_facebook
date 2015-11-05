@@ -42,7 +42,6 @@ $app_id = $CFG->fbkAppID;
 $app_secret = $CFG->fbkScrID;
 $helper = $facebook->getRedirectLoginHelper();
 $app_url="http://webcursos-d.uai.cl/local/facebook/connect.php";
-$accessToken = $helper->getAccessToken();
 
 require_login (); // Require log in.
 
@@ -278,7 +277,7 @@ if (isset ( $user_info->status )) {
 	}
 }
 // if the user has the account linkd it will show his information and some other actions the user can perform.
-$profile_request = $facebook->get('/me?fields=name,first_name,last_name,link');
+$profile_request = $facebook->get('/me?fields=name,first_name,last_name,link',$_SESSION['facebook_access_token']);
 $profile = $profile_request->getGraphNode()->asArray();
 vardump($profile);
 echo $OUTPUT->footer ();
