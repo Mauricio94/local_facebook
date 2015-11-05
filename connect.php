@@ -172,8 +172,7 @@ if (isset ( $user_info->status )) {
 	}
 } else if ($facebook_id == 0) { // If the user hasn"t accepted the permissions
 	echo $OUTPUT->heading ( get_string ( "acountconnect", "local_facebook" ) );
-	$params = ["link",
-				"email",
+	$params = [	"email",
 				"publish_actions",
 				"user_birthday",
 				"user_tagged_places",
