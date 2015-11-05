@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once ("/app/facebook-php-sdk-v4/src/Facebook/autoload.php");
+require_once ("/facebook-php-sdk-v4/src/Facebook/autoload.php");
 
 $config = array(
 		"app_id" => "633751800045647",
