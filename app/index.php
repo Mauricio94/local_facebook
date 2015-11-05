@@ -46,16 +46,11 @@ $tutorial_link = $CFG->fbktutorialsL;
 $messageurl = new moodle_url('/message/edit.php');
 $connecturl = new moodle_url('/local/facebook/connect.php');
 
-	if (isset($accessToken)) {
-		// Logged in!
-		$_SESSION["facebook_access_token"] = $accessToken;
-	} elseif ($helper->getError()) {
-		// The user denied the request
-		exit;
-	}
-	
+$accessToken = $helper->getAccessToken();
+
 $user_data = $facebook->get ("/me",$accessToken);
-	
+$facebook_id = $user_data["id"];
+
 // Gets the UAI left side bar of the app
 include 'htmltoinclude/sidebar.html';
 

@@ -41,25 +41,11 @@ $app_name = $CFG->fbkAppNAME;
 $app_id = $CFG->fbkAppID;
 $app_secret = $CFG->fbkScrID;
 $helper = $facebook->getRedirectLoginHelper();
+$helper2 = $facebook->getCanvasHelper();
 $app_url="https://webcursos-d.uai.cl/local/facebook/connect.php";
+$accessToken = $helper->getAccessToken();
 
 require_login (); // Require log in.
-
-try {
-	if (isset($_SESSION["facebook_access_token"])) {
-		$accessToken = $_SESSION["facebook_access_token"];
-	} else {
-		$accessToken = $helper->getAccessToken();
-	}
-} catch(Facebook\Exceptions\FacebookResponseException $e) {
-	// When Graph returns an error
-	echo "Graph returned an error: " . $e->getMessage();
-	exit;
-} catch(Facebook\Exceptions\FacebookSDKException $e) {
-	// When validation fails or other local issues
-	echo "Facebook SDK returned an error: " . $e->getMessage();
-	exit;
-}
 
 //$accessToken = $helper->getAccessToken();
 //$longLivedAccessToken = $accessToken->extend();
@@ -115,10 +101,9 @@ if (isset ( $user_info->status )) {
 		// We have a user ID, so probably a logged in user.
 		// If not, we"ll get an exception, which we handle below.
 		try {
-			if (isset($_SESSION["facebook_access_token"])) {
+			if (isset($accessToken)) {
 				// Logged in!
 				$accessToken = $_SESSION["facebook_access_token"];
-				$_SESSION["facebook_access_token"] = $accessToken;
 				$user_profile = $facebook->get("https://graph.facebook.com/" . $facebook_id . "?fields=link,first_name,middle_name,last_name",$accessToken);
 				$link = $user_profile["link"];
 				$first_name = $user_profile->getFirst_name;
@@ -197,7 +182,11 @@ if (isset ( $user_info->status )) {
 			$DB->update_record ( "facebook_user", $user_inactive );
 			echo "<script>location.reload();</script>";
 		}  // If the user wants to link a account that was never linked before.
-else {
+		else {
+			
+			$accessToken = $_SESSION["facebook_access_token"];
+			$user_profile = $facebook->get("/" . $facebook_id . "?fields=link,first_name,middle_name,last_name",$accessToken);
+			$facebook_id = user_profile;
 			
 			$record = new stdClass ();
 			$record->moodleid = $USER->id;
@@ -267,7 +256,8 @@ else {
 }
 // if the user has the account linkd it will show his information and some other actions the user can perform.
 //$user_data = $facebook->get ("/me?fields=link,first_name,middle_name,last_name",$longLivedAccessToken);
-$user_profile = $facebook->get("https://graph.facebook.com/" . $facebook_id . "?fields=link,first_name,middle_name,last_name",$accessToken);
+$accessToken2 = $helper2->getAccessToken();
+$user_profile = $facebook->get("/" . $facebook_id . "?fields=link,first_name,middle_name,last_name",$accessToken2);
 var_dump($user_profile);
 echo $OUTPUT->footer ();
 function table_generator($facebook_id, $link, $first_name, $middle_name, $last_name, $appname) {
