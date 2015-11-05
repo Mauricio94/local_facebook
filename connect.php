@@ -169,7 +169,7 @@ if (isset ( $user_info->status )) {
 		$button = new buttons ();
 		$button->display ();
 	}
-} else if ($facebook_id == 0) { // If the user hasn"t accepted the permissions
+} else if ($facebook_id == NULL) { // If the user hasn"t accepted the permissions
 	echo $OUTPUT->heading ( get_string ( "acountconnect", "local_facebook" ) );
 	$params = [	"email",
 				"publish_actions",
