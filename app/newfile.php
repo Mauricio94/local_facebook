@@ -1,7 +1,7 @@
 <?php
 require_once (dirname(dirname(dirname(dirname(__FILE__))))."/config.php");
-require_once ("/facebook-php-sdk-v4/src/Facebook/autoload.php");
-global $DB, $USER, $PAGE, $OUTPUT;
+global $CFG;
+require_once ($CFG->dirroot . "/local/facebook/app/facebook-php-sdk-v4/src/Facebook/autoload.php");
 
 require_login();
 if (isguestuser()) {
