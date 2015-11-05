@@ -13,20 +13,24 @@ $config = array(
 		"default_graph_version" => "v2.0" );
 
 
-$fb = new Facebook\Facebook ($config);
-$helper = $fb->getRedirectLoginHelper();
+$facebook = new Facebook\Facebook ($config);
+$helper = $facebook->getRedirectLoginHelper();
 $permissions = ['email']; // optional
 
-$context = context_system::instance();
-$urlindex = new moodle_url("/local/notebookstore/index.php");
+// URL for current page
+$url = new moodle_url ( "/local/facebook/connect.php" );
 
-// Page specification
-$PAGE->set_url($urlindex);
-$PAGE->set_context($context);
-$PAGE->set_pagelayout("standard");
+$context = context_system::instance ();
 
-echo $OUTPUT->header();
+$PAGE->set_url ( $url );
+$PAGE->set_context ( $context );
+$PAGE->set_pagelayout ( "standard" );
+$PAGE->set_title(get_string("connecttitle", "local_facebook"));
+$connect = optional_param ( "connect", null, PARAM_TEXT );
+$disconnect = optional_param ( "disconnect", null, PARAM_TEXT );
 
+$PAGE->navbar->add ( get_string ( "facebook", "local_facebook" ) );
+echo $OUTPUT->header ();
 
 try {
 	if (isset($_SESSION['facebook_access_token'])) {
@@ -45,17 +49,17 @@ try {
 }
 if (isset($accessToken)) {
 	if (isset($_SESSION['facebook_access_token'])) {
-		$fb->setDefaultAccessToken($_SESSION['facebook_access_token']);
+		$facebook->setDefaultAccessToken($_SESSION['facebook_access_token']);
 	} else {
 		// getting short-lived access token
 		$_SESSION['facebook_access_token'] = (string) $accessToken;
 		// OAuth 2.0 client handler
-		$oAuth2Client = $fb->getOAuth2Client();
+		$oAuth2Client = $facebook->getOAuth2Client();
 		// Exchanges a short-lived access token for a long-lived one
 		$longLivedAccessToken = $oAuth2Client->getLongLivedAccessToken($_SESSION['facebook_access_token']);
 		$_SESSION['facebook_access_token'] = (string) $longLivedAccessToken;
 		// setting default access token to be used in script
-		$fb->setDefaultAccessToken($_SESSION['facebook_access_token']);
+		$facebook->setDefaultAccessToken($_SESSION['facebook_access_token']);
 	}
 	// redirect the user back to the same page if it has "code" GET variable
 	if (isset($_GET['code'])) {
@@ -63,7 +67,7 @@ if (isset($accessToken)) {
 	}
 	// getting basic info about user
 	try {
-		$profile_request = $fb->get('/me?fields=name,first_name,last_name,email');
+		$profile_request = $facebook->get('/me?fields=name,first_name,last_name,email');
 		$profile = $profile_request->getGraphNode()->asArray();
 	} catch(Facebook\Exceptions\FacebookResponseException $e) {
 		// When Graph returns an error

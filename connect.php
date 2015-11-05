@@ -63,6 +63,37 @@ $connect = optional_param ( "connect", null, PARAM_TEXT );
 $disconnect = optional_param ( "disconnect", null, PARAM_TEXT );
 
 $PAGE->navbar->add ( get_string ( "facebook", "local_facebook" ) );
+
+try {
+	if (isset($_SESSION['facebook_access_token'])) {
+		$accessToken = $_SESSION['facebook_access_token'];
+	} else {
+		$accessToken = $helper->getAccessToken();
+	}
+} catch(Facebook\Exceptions\FacebookResponseException $e) {
+	// When Graph returns an error
+	echo 'Graph returned an error: ' . $e->getMessage();
+	exit;
+} catch(Facebook\Exceptions\FacebookSDKException $e) {
+	// When validation fails or other local issues
+	echo 'Facebook SDK returned an error: ' . $e->getMessage();
+	exit;
+}
+if (isset($accessToken)) {
+	if (isset($_SESSION['facebook_access_token'])) {
+		$facebook->setDefaultAccessToken($_SESSION['facebook_access_token']);
+	} else {
+		// getting short-lived access token
+		$_SESSION['facebook_access_token'] = (string) $accessToken;
+		// OAuth 2.0 client handler
+		$oAuth2Client = $facebook->getOAuth2Client();
+		// Exchanges a short-lived access token for a long-lived one
+		$longLivedAccessToken = $oAuth2Client->getLongLivedAccessToken($_SESSION['facebook_access_token']);
+		$_SESSION['facebook_access_token'] = (string) $longLivedAccessToken;
+		// setting default access token to be used in script
+		$facebook->setDefaultAccessToken($_SESSION['facebook_access_token']);
+	}
+}
 echo $OUTPUT->header ();
 
 // busco si el usuario tiene enlazada la cuenta
@@ -103,16 +134,16 @@ if (isset ( $user_info->status )) {
 		try {
 			if (isset($accessToken)) {
 				// Logged in!
-				$accessToken = $_SESSION["facebook_access_token"];
-				$user_profile = $facebook->get("https://graph.facebook.com/" . $facebook_id . "?fields=link,first_name,middle_name,last_name",$accessToken);
-				$link = $user_profile["link"];
-				$first_name = $user_profile->getFirst_name;
-				if (isset ( $user_profile ["middle_name"] )) {
-					$middle_name = $user_profile ["middle_name"];
+				$profile_request = $facebook->get('/me?fields=name,first_name,last_name,link');
+				$profile = $profile_request->getGraphNode()->asArray();
+				$link = $profile["link"];
+				$first_name = $profile["first_name"];
+				if (isset ( $profile ["middle_name"] )) {
+					$middle_name = $profile ["middle_name"];
 				} else {
 					$middle_name = "";
 				}
-				$last_name = $user_profile ["last_name"];
+				$last_name = $profile ["last_name"];
 				// Now you can redirect to another page and use the
 				// access token from $_SESSION['facebook_access_token']
 			} elseif ($helper->getError()) {
@@ -145,7 +176,8 @@ if (isset ( $user_info->status )) {
 	}
 } else if ($facebook_id == 0) { // If the user hasn"t accepted the permissions
 	echo $OUTPUT->heading ( get_string ( "acountconnect", "local_facebook" ) );
-	$params = ["email",
+	$params = ["link",
+				"email",
 				"publish_actions",
 				"user_birthday",
 				"user_tagged_places",
@@ -183,10 +215,9 @@ if (isset ( $user_info->status )) {
 			echo "<script>location.reload();</script>";
 		}  // If the user wants to link a account that was never linked before.
 		else {
-			
-			$accessToken = $_SESSION["facebook_access_token"];
-			$user_profile = $facebook->get("/" . $facebook_id . "?fields=link,first_name,middle_name,last_name",$accessToken);
-			$facebook_id = user_profile;
+			$profile_request = $facebook->get('/me?fields=name,first_name,last_name,link');
+			$profile = $profile_request->getGraphNode()->asArray();
+			$facebook_id = $profile["id"];
 			
 			$record = new stdClass ();
 			$record->moodleid = $USER->id;
@@ -208,21 +239,18 @@ if (isset ( $user_info->status )) {
 		// We have a user ID, so probably a logged in user.
 		// If not, we"ll get an exception, which we handle below.
 		try {
-		$accessToken = $helper->getAccessToken();
-			
 			if (isset($accessToken)) {
 				// Logged in!
-				$_SESSION["facebook_access_token"] = $accessToken;
-				$user_data = $facebook->get ("/me?fields=link,first_name,middle_name,last_name");
-				$user_profile = $user_data->getGraphUser();
-				$link = $user_profile["link"];
-				$first_name = $user_profile["first_name"];
-				if (isset ( $user_profile ["middle_name"] )) {
-					$middle_name = $user_profile ["middle_name"];
+				$profile_request = $facebook->get('/me?fields=name,first_name,last_name,link');
+				$profile = $profile_request->getGraphNode()->asArray();
+				$link = $profile["link"];
+				$first_name = $profile["first_name"];
+				if (isset ( $profile ["middle_name"] )) {
+					$middle_name = $profile ["middle_name"];
 				} else {
 					$middle_name = "";
 				}
-				$last_name = $user_profile ["last_name"];
+				$last_name = $profile ["last_name"];
 				// Now you can redirect to another page and use the
 				// access token from $_SESSION['facebook_access_token']
 			} elseif ($helper->getError()) {
@@ -256,9 +284,6 @@ if (isset ( $user_info->status )) {
 }
 // if the user has the account linkd it will show his information and some other actions the user can perform.
 //$user_data = $facebook->get ("/me?fields=link,first_name,middle_name,last_name",$longLivedAccessToken);
-$accessToken2 = $helper2->getAccessToken();
-$user_profile = $facebook->get("/" . $facebook_id . "?fields=link,first_name,middle_name,last_name",$accessToken2);
-var_dump($user_profile);
 echo $OUTPUT->footer ();
 function table_generator($facebook_id, $link, $first_name, $middle_name, $last_name, $appname) {
 	$img = "<img src='https://graph.facebook.com/" . $facebook_id . "/picture?type=large'>";
