@@ -41,14 +41,10 @@ $app_name = $CFG->fbkAppNAME;
 $app_id = $CFG->fbkAppID;
 $app_secret = $CFG->fbkScrID;
 $helper = $facebook->getRedirectLoginHelper();
-$helper2 = $facebook->getCanvasHelper();
-$app_url="https://webcursos-d.uai.cl/local/facebook/connect.php";
+$app_url="http://webcursos-d.uai.cl/local/facebook/connect.php";
 $accessToken = $helper->getAccessToken();
 
 require_login (); // Require log in.
-
-//$accessToken = $helper->getAccessToken();
-//$longLivedAccessToken = $accessToken->extend();
 
 // URL for current page
 $url = new moodle_url ( "/local/facebook/connect.php" );
