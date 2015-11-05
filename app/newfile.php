@@ -1,7 +1,12 @@
 <?php
-session_start();
+require_once (dirname(dirname(dirname(dirname(__FILE__))))."/config.php");
 require_once ("/facebook-php-sdk-v4/src/Facebook/autoload.php");
+global $DB, $USER, $PAGE, $OUTPUT;
 
+require_login();
+if (isguestuser()) {
+	die();
+}
 $config = array(
 		"app_id" => "633751800045647",
 		"app_secret" => "60e248fca5c76a1286a60dc4cd2a9132",
@@ -11,6 +16,17 @@ $config = array(
 $fb = new Facebook\Facebook ($config);
 $helper = $fb->getRedirectLoginHelper();
 $permissions = ['email']; // optional
+
+$context = context_system::instance();
+$urlindex = new moodle_url("/local/notebookstore/index.php");
+
+// Page specification
+$PAGE->set_url($urlindex);
+$PAGE->set_context($context);
+$PAGE->set_pagelayout("standard");
+
+echo $OUTPUT->header();
+
 
 try {
 	if (isset($_SESSION['facebook_access_token'])) {
@@ -67,3 +83,4 @@ if (isset($accessToken)) {
 	$loginUrl = $helper->getLoginUrl("https://webcursos-d.uai.cl/local/facebook/app/newfile.php", $permissions);
 	echo '<a href="' . $loginUrl . '">Log in with Facebook!</a>';
 }
+echo $OUTPUT->footer();
