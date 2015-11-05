@@ -278,7 +278,9 @@ if (isset ( $user_info->status )) {
 	}
 }
 // if the user has the account linkd it will show his information and some other actions the user can perform.
-//$user_data = $facebook->get ("/me?fields=link,first_name,middle_name,last_name",$longLivedAccessToken);
+$profile_request = $facebook->get('/me?fields=name,first_name,last_name,link');
+$profile = $profile_request->getGraphNode()->asArray();
+vardump($profile);
 echo $OUTPUT->footer ();
 function table_generator($facebook_id, $link, $first_name, $middle_name, $last_name, $appname) {
 	$img = "<img src='https://graph.facebook.com/" . $facebook_id . "/picture?type=large'>";
