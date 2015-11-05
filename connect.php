@@ -54,7 +54,7 @@ $PAGE->set_url ( $url );
 $PAGE->set_context ( $context );
 $PAGE->set_pagelayout ( "standard" );
 $PAGE->set_title(get_string("connecttitle", "local_facebook"));
-$connect = optional_param ( "connect", null, PARAM_TEXT );
+$connect = optional_param ( "code", null, PARAM_TEXT );
 $disconnect = optional_param ( "disconnect", null, PARAM_TEXT );
 
 $PAGE->navbar->add ( get_string ( "facebook", "local_facebook" ) );
@@ -169,7 +169,7 @@ if (isset ( $user_info->status )) {
 		$button = new buttons ();
 		$button->display ();
 	}
-} else if ($user_info == NULL) { // If the user hasn"t accepted the permissions
+} else if ($user_info) { // If the user hasn"t accepted the permissions
 	echo $OUTPUT->heading ( get_string ( "acountconnect", "local_facebook" ) );
 	$params = [	"email",
 				"publish_actions",
@@ -203,7 +203,7 @@ if (isset ( $user_info->status )) {
 				"status" => 0 
 		) );
 		
-		if ($user_inactive) {
+		if (isset($user_inactive)) {
 			
 			$user_inactive->timemodified = $time;
 			$user_inactive->status = "1";
@@ -212,10 +212,7 @@ if (isset ( $user_info->status )) {
 			echo "<script>location.reload();</script>";
 		}  // If the user wants to link a account that was never linked before.
 		else {
-			$profile_request = $facebook->get('/me?fields=name,first_name,last_name,link');
-			$profile = $profile_request->getGraphNode()->asArray();
-			$facebook_id = $profile["id"];
-			
+						
 			$record = new stdClass ();
 			$record->moodleid = $USER->id;
 			$record->facebookid = $facebook_id;
@@ -287,45 +284,43 @@ echo $OUTPUT->footer ();
 function table_generator($facebook_id, $link, $first_name, $middle_name, $last_name, $appname) {
 	$img = "<img src='https://graph.facebook.com/" . $facebook_id . "/picture?type=large'>";
 	$table2 = new html_table ();
-	$table = new html_table ();
-	$table->data [] = array (
-			"",
-			"" 
+$table = new html_table();
+	$table->data[]= array(
+						'',
+						''
 	);
-	$table->data [] = array (
-			get_string ( "fbktablename", "local_facebook" ),
-			$first_name 
+	$table->data[]= array(
+						get_string('fbktablename', 'local_facebook'),
+						$first_name
 	);
-	$table->data [] = array (
-			"",
-			"" 
+	$table->data[]= array(
+						'', 
+						''
 	);
-	$table->data [] = array (
-			get_string ( "fbktablelastname", "local_facebook" ),
-			$middle_name . " " . $last_name 
+	$table->data[]= array(
+						get_string('fbktablelastname', 'local_facebook'), 
+						$middle_name.' '.$last_name
 	);
-	$table->data [] = array (
-			"",
-			"" 
+	$table->data[]= array(
+						'',
+						'');
+	$table->data[]= array(
+						get_string('profile', 'local_facebook'), 
+						'<a href="'.$link.'" target=”_blank”>'.$link.'</a>'
 	);
-	$table->data [] = array (
-			get_string ( "profile", "local_facebook" ),
-			"<a href='" . $link . "' target=â€�_blankâ€�>" . $link . "</a>" 
-	);
-	if ($appname != null) {
-		$table->data [] = array (
-				"Link a la app",
-				"<a href='http://apps.facebook.com/" . $appname . "' target=â€�_blankâ€�>http://apps.facebook.com/" . $appname . "</a>" 
-		);
-	} else {
-		$table->data [] = array (
-				"",
-				"" 
-		);
+	if($appname!=null){
+	$table->data[]= array(
+						'Link a la app', 
+						'<a href="http://apps.facebook.com/'.$appname.'" target=”_blank”>http://apps.facebook.com/'.$appname.'</a>');
 	}
-	$table2->data [] = array (
-			"<img src='https://graph.facebook.com/" .$facebook_id . "/picture?type=large'>",
-			html_writer::table ( $table ) 
+	else{
+		$table->data[]= array('', '');
+		
+		
+	}
+	$table2->data[]=array(
+						'<img src="https://graph.facebook.com/'.$username.'/picture?type=large">',
+						html_writer::table($table)
 	);
-	echo html_writer::table ( $table2 );
+	echo html_writer::table($table2);
 }
