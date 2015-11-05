@@ -169,7 +169,7 @@ if (isset ( $user_info->status )) {
 		$button = new buttons ();
 		$button->display ();
 	}
-} else if ($user_info) { // If the user hasn"t accepted the permissions
+} else if ($facebook_id == 0) { // If the user hasn"t accepted the permissions
 	echo $OUTPUT->heading ( get_string ( "acountconnect", "local_facebook" ) );
 	$params = [	"email",
 				"publish_actions",
@@ -235,6 +235,7 @@ if (isset ( $user_info->status )) {
 				// Logged in!
 				$profile_request = $facebook->get('/me?fields=name,first_name,last_name,link');
 				$profile = $profile_request->getGraphNode()->asArray();
+				$facebook_id = $profile["id"];
 				$link = $profile["link"];
 				$first_name = $profile["first_name"];
 				if (isset ( $profile ["middle_name"] )) {
@@ -275,9 +276,6 @@ if (isset ( $user_info->status )) {
 	}
 }
 // if the user has the account linkd it will show his information and some other actions the user can perform.
-$profile_request = $facebook->get('/me?fields=name,first_name,last_name,link',$_SESSION['facebook_access_token']);
-$profile = $profile_request->getGraphNode()->asArray();
-var_dump($profile);
 echo $OUTPUT->footer ();
 function table_generator($facebook_id, $link, $first_name, $middle_name, $last_name, $appname) {
 	$img = "<img src='https://graph.facebook.com/" . $facebook_id . "/picture?type=large'>";
