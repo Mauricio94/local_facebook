@@ -31,7 +31,6 @@ require_once (dirname ( dirname ( dirname ( __FILE__ ) ) ) . "/config.php");
 include "app/config.php";
 global $DB, $USER, $CFG;
 require_once ( $CFG->dirroot . "/local/facebook/forms.php" );
-use Facebook\Facebook;
 use Facebook\FacebookRedirectLoginHelper;
 use Facebook\Response;
 use Facebook\FacebookSDKException;
