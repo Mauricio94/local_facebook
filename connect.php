@@ -181,11 +181,20 @@ if (isset ( $user_info->status )) {
 		) );
 		
 		if ($user_inactive) {
+
+			$user_inactive->timemodified = $time;
+			$user_inactive->status = "1";
+			$user_inactive->lasttimechecked = $time;
+			$DB->update_record ( "facebook_user", $user_inactive );
+			echo "<script>location.reload();</script>";
+			
+			}  // If the user wants to link a account that was never linked before.
+		else {
 			
 			$profile_request = $facebook->get('/me?fields=name,first_name,middle_name,last_name,link');
 			$profile = $profile_request->getGraphNode()->asArray();
 			$facebook_id = $profile["id"];
-				
+			
 			$record = new stdClass ();
 			$record->moodleid = $USER->id;
 			$record->facebookid = $facebook_id;
@@ -195,13 +204,6 @@ if (isset ( $user_info->status )) {
 			if ($facebook_id != 0) {
 				$DB->insert_record ( "facebook_user", $record );
 			}
-			echo "<script>location.reload();</script>";			
-			}  // If the user wants to link a account that was never linked before.
-		else {
-			$user_inactive->timemodified = $time;
-			$user_inactive->status = "1";
-			$user_inactive->lasttimechecked = $time;
-			$DB->update_record ( "facebook_user", $user_inactive );
 			echo "<script>location.reload();</script>";
 		}
 	} else {
