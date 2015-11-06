@@ -255,9 +255,5 @@ function table_generator($facebook_id, $link, $first_name, $middle_name, $last_n
 		
 		
 	}
-	$table2->data[]=array(
-						'<img src="https://graph.facebook.com/'.$facebook_id.'/picture?type=large">',
-						html_writer::table($table)
-	);
-	echo html_writer::table($table2);
+	echo html_writer::table($table);
 }

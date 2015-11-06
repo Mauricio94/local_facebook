@@ -33,11 +33,11 @@ require_once($CFG->dirroot."/local/facebook/locallib.php");
 global $DB, $USER, $CFG;
 include "htmltoinclude/javascriptindex.html";
 include "config.php";
-use Facebook\FacebookRedirectLoginHelper;
+use Facebook\FacebookCanvasHelper;
 
 // Gets all facebook information needed
 $facebook = new Facebook\Facebook($config);
-$helper = $facebook->getRedirectLoginHelper();
+$helper = $facebook->getCanvasHelper();
 $facebook_id = $user_data["id"];
 $app_name = $CFG->app_name;
 $app_email = $CFG->fbkemail;
@@ -46,10 +46,38 @@ $tutorial_link = $CFG->fbktutorialsL;
 $messageurl = new moodle_url('/message/edit.php');
 $connecturl = new moodle_url('/local/facebook/connect.php');
 
-$accessToken = $helper->getAccessToken();
+try {
+	if (isset($_SESSION['facebook_access_token'])) {
+	$accessToken = $_SESSION['facebook_access_token'];
+	} else {
+  		$accessToken = $helper->getAccessToken();
+	}
+} catch(Facebook\Exceptions\FacebookResponseException $e) {
+ 	// When Graph returns an error
+ 	echo 'Graph returned an error: ' . $e->getMessage();
+  	exit;
+} catch(Facebook\Exceptions\FacebookSDKException $e) {
+ 	// When validation fails or other local issues
+	echo 'Facebook SDK returned an error: ' . $e->getMessage();
+  	exit;
+ }
+if (isset($accessToken)) {
+	if (isset($_SESSION['facebook_access_token'])) {
+		$facebook->setDefaultAccessToken($_SESSION['facebook_access_token']);
+	} else {
+		$_SESSION['facebook_access_token'] = (string) $accessToken;
+	  	// OAuth 2.0 client handler
+		$oAuth2Client = $facebook->getOAuth2Client();
+		// Exchanges a short-lived access token for a long-lived one
+		$longLivedAccessToken = $oAuth2Client->getLongLivedAccessToken($_SESSION['facebook_access_token']);
+		$_SESSION['facebook_access_token'] = (string) $longLivedAccessToken;
+		$facebook->setDefaultAccessToken($_SESSION['facebook_access_token']);
+	}
+}
 
-$user_data = $facebook->get ("/me",$accessToken);
-$facebook_id = $user_data["id"];
+$user_data = $facebook->get ("/me");
+$user = $user_data->getGraphNode()->asArray();
+$facebook_id = $user["id"];
 
 // Gets the UAI left side bar of the app
 include 'htmltoinclude/sidebar.html';
