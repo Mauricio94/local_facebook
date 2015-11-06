@@ -38,8 +38,7 @@ use Facebook\FacebookCanvasHelper;
 // Gets all facebook information needed
 $facebook = new Facebook\Facebook($config);
 $helper = $facebook->getCanvasHelper();
-$facebook_id = $user_data["id"];
-$app_name = $CFG->app_name;
+$app_name = $CFG->fbkAppNAME;
 $app_email = $CFG->fbkemail;
 $tutorial_name = $CFG->fbktutorialsN;
 $tutorial_link = $CFG->fbktutorialsL;
