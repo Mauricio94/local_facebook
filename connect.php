@@ -32,6 +32,7 @@ include "app/config.php";
 global $DB, $USER, $CFG;
 require_once ( $CFG->dirroot . "/local/facebook/forms.php" );
 use Facebook\FacebookRedirectLoginHelper;
+use Facebook\Response;
 use Facebook\FacebookSDKException;
 
 $facebook = new Facebook\Facebook ( $config );
@@ -57,33 +58,33 @@ $disconnect = optional_param ( "disconnect", null, PARAM_TEXT );
 $PAGE->navbar->add ( get_string ( "facebook", "local_facebook" ) );
 
 try {
-	if( isset( $_SESSION['facebook_access_token'] ) ) {
-		$accessToken = $_SESSION["facebook_access_token"];
+	if(isset($_SESSION['facebook_access_token'])) {
+		$accessToken = $_SESSION['facebook_access_token'];
 	} else {
 		$accessToken = $helper->getAccessToken();
 	}
-} catch( Facebook\Exceptions\FacebookResponseException $e ) {
+} catch(Facebook\Exceptions\FacebookResponseException $e ) {
 	// When Graph returns an error
 	echo "Graph returned an error: " . $e->getMessage();
 	exit;
-} catch( Facebook\Exceptions\FacebookSDKException $e ) {
+} catch(Facebook\Exceptions\FacebookSDKException $e ) {
 	// When validation fails or other local issues
 	echo "Facebook SDK returned an error: " . $e->getMessage();
 	exit;
 }
-if( isset( $accessToken ) ) {
-	if( isset( $_SESSION["facebook_access_token"] ) ) {
-		$facebook->setDefaultAccessToken( $_SESSION["facebook_access_token"] );
+if(isset($accessToken)) {
+	if(isset($_SESSION['facebook_access_token'] ) ) {
+		$facebook->setDefaultAccessToken( $_SESSION['facebook_access_token'] );
 	} else {
 		// getting short-lived access token
-		$_SESSION["facebook_access_token"] = (string) $accessToken;
+		$_SESSION['facebook_access_token'] = (string) $accessToken;
 		// OAuth 2.0 client handler
 		$oAuth2Client = $facebook->getOAuth2Client();
 		// Exchanges a short-lived access token for a long-lived one
-		$longLivedAccessToken = $oAuth2Client->getLongLivedAccessToken ( $_SESSION['facebook_access_token'] );
-		$_SESSION["facebook_access_token"] = (string) $longLivedAccessToken;
+		$longLivedAccessToken = $oAuth2Client->getLongLivedAccessToken ($_SESSION['facebook_access_token']);
+		$_SESSION['facebook_access_token'] = (string) $longLivedAccessToken;
 		// setting default access token to be used in script
-		$facebook->setDefaultAccessToken($_SESSION["facebook_access_token"]);
+		$facebook->setDefaultAccessToken($_SESSION['facebook_access_token']);
 	}
 }
 echo $OUTPUT->header ();
