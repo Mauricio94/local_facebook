@@ -166,7 +166,7 @@ $token = $CFG->fbkTkn;
 $config = array(
 		'appId' => $AppID,
 		'secret' => $SecretID,
-		'grant_type' => 'client_credentials' );
+		"default_graph_version" => "v2.0");
 $facebook = new Facebook($config, true);
 
 $counttosend = 0;

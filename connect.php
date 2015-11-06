@@ -30,18 +30,15 @@
 require_once (dirname ( dirname ( dirname ( __FILE__ ) ) ) . "/config.php");
 include "app/config.php";
 global $DB, $USER, $CFG;
-require_once ($CFG->dirroot . "/local/facebook/forms.php");
-use Facebook\FacebookResponse;
+require_once ( $CFG->dirroot . "/local/facebook/forms.php" );
 use Facebook\FacebookRedirectLoginHelper;
-use Facebook\FacebookRequire;
 use Facebook\FacebookSDKException;
 
-$facebook = new Facebook\Facebook ($config);
+$facebook = new Facebook\Facebook ( $config );
 $app_name = $CFG->fbkAppNAME;
 $app_id = $CFG->fbkAppID;
-$app_secret = $CFG->fbkScrID;
 $helper = $facebook->getRedirectLoginHelper();
-$app_url="http://webcursos-d.uai.cl/local/facebook/connect.php";
+$app_url = "http://webcursos-d.uai.cl/local/facebook/connect.php";
 
 require_login (); // Require log in.
 
@@ -53,40 +50,40 @@ $context = context_system::instance ();
 $PAGE->set_url ( $url );
 $PAGE->set_context ( $context );
 $PAGE->set_pagelayout ( "standard" );
-$PAGE->set_title(get_string("connecttitle", "local_facebook"));
+$PAGE->set_title( get_string ( "connecttitle", "local_facebook" ) );
 $connect = optional_param ( "code", null, PARAM_TEXT );
 $disconnect = optional_param ( "disconnect", null, PARAM_TEXT );
 
 $PAGE->navbar->add ( get_string ( "facebook", "local_facebook" ) );
 
 try {
-	if (isset($_SESSION['facebook_access_token'])) {
-		$accessToken = $_SESSION['facebook_access_token'];
+	if( isset( $_SESSION['facebook_access_token'] ) ) {
+		$accessToken = $_SESSION["facebook_access_token"];
 	} else {
 		$accessToken = $helper->getAccessToken();
 	}
-} catch(Facebook\Exceptions\FacebookResponseException $e) {
+} catch( Facebook\Exceptions\FacebookResponseException $e ) {
 	// When Graph returns an error
-	echo 'Graph returned an error: ' . $e->getMessage();
+	echo "Graph returned an error: " . $e->getMessage();
 	exit;
-} catch(Facebook\Exceptions\FacebookSDKException $e) {
+} catch( Facebook\Exceptions\FacebookSDKException $e ) {
 	// When validation fails or other local issues
-	echo 'Facebook SDK returned an error: ' . $e->getMessage();
+	echo "Facebook SDK returned an error: " . $e->getMessage();
 	exit;
 }
-if (isset($accessToken)) {
-	if (isset($_SESSION['facebook_access_token'])) {
-		$facebook->setDefaultAccessToken($_SESSION['facebook_access_token']);
+if( isset( $accessToken ) ) {
+	if( isset( $_SESSION["facebook_access_token"] ) ) {
+		$facebook->setDefaultAccessToken( $_SESSION["facebook_access_token"] );
 	} else {
 		// getting short-lived access token
-		$_SESSION['facebook_access_token'] = (string) $accessToken;
+		$_SESSION["facebook_access_token"] = (string) $accessToken;
 		// OAuth 2.0 client handler
 		$oAuth2Client = $facebook->getOAuth2Client();
 		// Exchanges a short-lived access token for a long-lived one
-		$longLivedAccessToken = $oAuth2Client->getLongLivedAccessToken($_SESSION['facebook_access_token']);
-		$_SESSION['facebook_access_token'] = (string) $longLivedAccessToken;
+		$longLivedAccessToken = $oAuth2Client->getLongLivedAccessToken ( $_SESSION['facebook_access_token'] );
+		$_SESSION["facebook_access_token"] = (string) $longLivedAccessToken;
 		// setting default access token to be used in script
-		$facebook->setDefaultAccessToken($_SESSION['facebook_access_token']);
+		$facebook->setDefaultAccessToken($_SESSION["facebook_access_token"]);
 	}
 }
 echo $OUTPUT->header ();
@@ -104,9 +101,9 @@ $time = time ();
 // if the status is 0 is because the user has unlink the facebook account and if the $user_info is null is because the user hasn"t link the account yet.
 // if any of these things happend it will give the user the option to link the account
 
-if (isset ( $user_info->status )) {
+if( isset( $user_info->status ) ) {
 	// If the user press the unlink account
-	if ($disconnect != NULL) {
+	if ( $disconnect != NULL ) {
 		
 		// Save all the user info but with status 0
 		$record = new stdClass ();
@@ -127,13 +124,13 @@ if (isset ( $user_info->status )) {
 		// We have a user ID, so probably a logged in user.
 		// If not, we"ll get an exception, which we handle below.
 		try {
-			if (isset($accessToken)) {
+			if( isset( $accessToken ) ) {
 				// Logged in!
-				$profile_request = $facebook->get('/me?fields=name,first_name,middle_name,last_name,link');
+				$profile_request = $facebook->get("/me?fields=name,first_name,middle_name,last_name,link");
 				$profile = $profile_request->getGraphNode()->asArray();
 				$link = $profile["link"];
 				$first_name = $profile["first_name"];
-				if (isset ( $profile ["middle_name"] )) {
+				if (isset ( $profile ["middle_name"] ) ) {
 					$middle_name = $profile ["middle_name"];
 				} else {
 					$middle_name = "";
@@ -141,17 +138,17 @@ if (isset ( $user_info->status )) {
 				$last_name = $profile ["last_name"];
 				// Now you can redirect to another page and use the
 				// access token from $_SESSION['facebook_access_token']
-			} elseif ($helper->getError()) {
+			} elseif( $helper->getError() ) {
 				// The user denied the request
 				exit;
 			}
 					
-		} catch ( FacebookApiException $e ) {
+		} catch( FacebookApiException $e ) {
 			// If the user is logged out, you can have a
 			// user ID even though the access token is invalid.
 			// In this case, we"ll get an exception, so we"ll
 			// just ask the user to login again here.
-			$loginUrl = $helper->getLoginUrl($app_url, $params);
+			$loginUrl = $helper->getLoginUrl( $app_url, $params );
 			echo "Please <a href='" . $login_Url . "'>login.</a>";
 			error_log ( $e->getType () );
 			error_log ( $e->getMessage () );
@@ -172,7 +169,7 @@ if (isset ( $user_info->status )) {
 } else {
 	
 	// If he clicked the link button.
-	if ($connect != NULL) {
+	if( $connect != NULL ) {
 		
 		// If the user wants to link an account that was already linked, but was unlinked that means with status 0
 				$user_inactive = $DB->get_record ( "facebook_user", array (
@@ -180,7 +177,7 @@ if (isset ( $user_info->status )) {
 				"status" => 0 
 		) );
 		
-		if ($user_inactive) {
+		if( $user_inactive ) {
 
 			$user_inactive->timemodified = $time;
 			$user_inactive->status = "1";
@@ -191,7 +188,7 @@ if (isset ( $user_info->status )) {
 			}  // If the user wants to link a account that was never linked before.
 		else {
 			
-			$profile_request = $facebook->get('/me?fields=name,first_name,middle_name,last_name,link');
+			$profile_request = $facebook->get("/me?fields=name,first_name,middle_name,last_name,link");
 			$profile = $profile_request->getGraphNode()->asArray();
 			$facebook_id = $profile["id"];
 			
@@ -201,7 +198,7 @@ if (isset ( $user_info->status )) {
 			$record->timemodified = $time;
 			$record->status = "1";
 			$record->lasttimechecked = $time;
-			if ($facebook_id != 0) {
+			if ( $facebook_id != 0 ) {
 				$DB->insert_record ( "facebook_user", $record );
 			}
 			echo "<script>location.reload();</script>";
@@ -221,7 +218,7 @@ if (isset ( $user_info->status )) {
 				"user_friends",
 				"user_religion_politics"
 		];
-		$loginUrl = $helper->getLoginUrl($app_url, $params);
+		$loginUrl = $helper->getLoginUrl( $app_url, $params );
 		
 		echo "<br><center><a href='" . $loginUrl . "'><img src='app/images/login.jpg'width='180' height='30'></a><center>";
 		
@@ -229,34 +226,35 @@ if (isset ( $user_info->status )) {
 }
 // if the user has the account linkd it will show his information and some other actions the user can perform.
 echo $OUTPUT->footer ();
-function table_generator($facebook_id, $link, $first_name, $middle_name, $last_name, $appname) {
+function table_generator( $facebook_id, $link, $first_name, $middle_name, $last_name, $appname ) {
 	$img = "<img src='https://graph.facebook.com/" . $facebook_id . "/picture?type=large'>";
 	$table = new html_table();
-	$table2 = new html_table ();
+	$table2 = new html_table();
 	$table->data[]= array(
-						'',
-						''
+						"",
+						""
 	);
 	$table->data[]= array(
-						get_string('fbktablename', 'local_facebook'),
-						$first_name." ".$middle_name.' '.$last_name
+						get_string( "fbktablename", "local_facebook" ),
+						$first_name." ".$middle_name." ".$last_name
 	);
 	$table->data[]= array(
-						'',
-						'');
+						"",
+						"");
 	$table->data[]= array(
-						get_string('profile', 'local_facebook'), 
-						'<a href="'.$link.'" target=”_blank”>'.$link.'</a>'
+						get_string( "profile", "local_facebook" ), 
+						"<a href='".$link."' target=”_blank”>".$link."</a>"
 	);
-	if($appname!=null){
+	if( $appname!=null ){
 	$table->data[]= array(
-						'Link a la app', 
-						'<a href="http://apps.facebook.com/'.$appname.'" target=”_blank”>http://apps.facebook.com/'.$appname.'</a>');
+						get_string( "link", "local_facebook" ), 
+						"<a href='http://apps.facebook.com/".$appname."' target=”_blank”>http://apps.facebook.com/".$appname."</a>");
 	}
 	else{
-		$table->data[]= array('', '');
-		
-		
+		$table->data[]= array(
+						"",
+						""
+	);
 	}
 	$table2->data [] = array (
 			"<img src='https://graph.facebook.com/" .$facebook_id . "/picture?type=large'>",

@@ -34,7 +34,10 @@ require_once($CFG->libdir.'/datalib.php');      // Data lib functions
 require_once($CFG->libdir.'/accesslib.php');      // Access lib functions
 require_once($CFG->dirroot.'/course/lib.php');      // Course lib functions
 require_once($CFG->dirroot.'/enrol/guest/lib.php');      // Guest enrol lib functions
-include "../app/facebook-php-sdk-master/src/facebook.php";
+global $CFG;
+require_once ($CFG->dirroot . "/local/facebook/app/facebook-php-sdk-v4/src/Facebook/autoload.php");
+use Facebook\Facebook;
+use Facebook\FacebookCanvasHelper;
 
 // Now get cli options
 list($options, $unrecognized) = cli_get_params(
@@ -72,10 +75,10 @@ echo "\nStarting at ".date("F j, Y, G:i:s")."\n";
 $AppID = $CFG->fbkAppID;
 $SecretID = $CFG->fbkScrID;
 $config = array(
-		'appId' => $AppID,
-		'secret' => $SecretID,
-		'grant_type' => 'client_credentials' );
-$facebook = new Facebook($config, true);
+		"appId" => $AppID,
+		"secret" => $SecretID,
+		"default_graph_version" => "v2.0");
+$facebook = new Facebook\Facebook($config);
 
 $facebook_id = $facebook->getUser();
 

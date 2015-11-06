@@ -55,3 +55,5 @@ $string["courses"] = "Mis cursos";
 $string["help"] = "Ayuda";
 $string["email"] = "webcursos@uai.cl";
 $string["connecttitle"] = "Conexión a facebook";
+$string["link"] = "Link a la app";
+$string["nocourses"] = "No tiene cursos que mostrar";
