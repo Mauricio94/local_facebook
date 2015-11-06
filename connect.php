@@ -232,6 +232,7 @@ echo $OUTPUT->footer ();
 function table_generator($facebook_id, $link, $first_name, $middle_name, $last_name, $appname) {
 	$img = "<img src='https://graph.facebook.com/" . $facebook_id . "/picture?type=large'>";
 	$table = new html_table();
+	$table2 = new html_table ();
 	$table->data[]= array(
 						'',
 						''
@@ -257,5 +258,9 @@ function table_generator($facebook_id, $link, $first_name, $middle_name, $last_n
 		
 		
 	}
-	echo html_writer::table($table);
+	$table2->data [] = array (
+			"<img src='https://graph.facebook.com/" .$facebook_id . "/picture?type=large'>",
+			html_writer::table ( $table ) 
+	);
+	echo html_writer::table ( $table2 );
 }
