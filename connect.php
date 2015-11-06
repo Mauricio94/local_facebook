@@ -64,11 +64,11 @@ try {
 	} else {
 		$accessToken = $helper->getAccessToken();
 	}
-} catch(Facebook\Exceptions\FacebookResponseException $e ) {
+} catch(Facebook\Exceptions\FacebookResponseException $e) {
 	// When Graph returns an error
 	echo "Graph returned an error: " . $e->getMessage();
 	exit;
-} catch(Facebook\Exceptions\FacebookSDKException $e ) {
+} catch(Facebook\Exceptions\FacebookSDKException $e) {
 	// When validation fails or other local issues
 	echo "Facebook SDK returned an error: " . $e->getMessage();
 	exit;
@@ -82,7 +82,7 @@ if(isset($accessToken)) {
 		// OAuth 2.0 client handler
 		$oAuth2Client = $facebook->getOAuth2Client();
 		// Exchanges a short-lived access token for a long-lived one
-		$longLivedAccessToken = $oAuth2Client->getLongLivedAccessToken ($_SESSION['facebook_access_token']);
+		$longLivedAccessToken = $oAuth2Client->getLongLivedAccessToken($_SESSION['facebook_access_token']);
 		$_SESSION['facebook_access_token'] = (string) $longLivedAccessToken;
 		// setting default access token to be used in script
 		$facebook->setDefaultAccessToken($_SESSION['facebook_access_token']);
@@ -126,7 +126,7 @@ if( isset( $user_info->status ) ) {
 		// We have a user ID, so probably a logged in user.
 		// If not, we"ll get an exception, which we handle below.
 		try {
-			if( isset( $accessToken ) ) {
+			if($accessToken) {
 				// Logged in!
 				$profile_request = $facebook->get("/me?fields=name,first_name,middle_name,last_name,link");
 				$profile = $profile_request->getGraphNode()->asArray();
