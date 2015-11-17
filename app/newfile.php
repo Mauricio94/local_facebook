@@ -14,8 +14,8 @@ $config = array(
 
 
 $facebook = new Facebook\Facebook ($config);
-$helper = $facebook->getRedirectLoginHelper();
-$permissions = ['email']; // optional
+$helper = $fb->getCanvasHelper();
+$permissions = ['email', 'publish_actions']; // optional
 
 // URL for current page
 $url = new moodle_url ( "/local/facebook/connect.php" );
@@ -36,39 +36,54 @@ try {
 	if (isset($_SESSION['facebook_access_token'])) {
 		$accessToken = $_SESSION['facebook_access_token'];
 	} else {
-		$accessToken = $helper->getAccessToken();
+  		$accessToken = $helper->getAccessToken();
 	}
 } catch(Facebook\Exceptions\FacebookResponseException $e) {
-	// When Graph returns an error
-	echo 'Graph returned an error: ' . $e->getMessage();
-	exit;
+ 	// When Graph returns an error
+ 	echo 'Graph returned an error: ' . $e->getMessage();
+  	exit;
 } catch(Facebook\Exceptions\FacebookSDKException $e) {
-	// When validation fails or other local issues
+ 	// When validation fails or other local issues
 	echo 'Facebook SDK returned an error: ' . $e->getMessage();
-	exit;
-}
+  	exit;
+ }
 if (isset($accessToken)) {
 	if (isset($_SESSION['facebook_access_token'])) {
-		$facebook->setDefaultAccessToken($_SESSION['facebook_access_token']);
+		$fb->setDefaultAccessToken($_SESSION['facebook_access_token']);
 	} else {
-		// getting short-lived access token
 		$_SESSION['facebook_access_token'] = (string) $accessToken;
-		// OAuth 2.0 client handler
-		$oAuth2Client = $facebook->getOAuth2Client();
+	  	// OAuth 2.0 client handler
+		$oAuth2Client = $fb->getOAuth2Client();
 		// Exchanges a short-lived access token for a long-lived one
 		$longLivedAccessToken = $oAuth2Client->getLongLivedAccessToken($_SESSION['facebook_access_token']);
 		$_SESSION['facebook_access_token'] = (string) $longLivedAccessToken;
-		// setting default access token to be used in script
-		$facebook->setDefaultAccessToken($_SESSION['facebook_access_token']);
+		$fb->setDefaultAccessToken($_SESSION['facebook_access_token']);
 	}
-	// redirect the user back to the same page if it has "code" GET variable
-	if (isset($_GET['code'])) {
-		header('Location: ./');
-	}
-	// getting basic info about user
+	
+	// validating the access token
 	try {
-		$profile_request = $facebook->get('/me?fields=name,first_name,last_name,link');
-		$profile = $profile_request->getGraphNode()->asArray();
+		$request = $fb->get('/me');
+	} catch(Facebook\Exceptions\FacebookResponseException $e) {
+		// When Graph returns an error
+		if ($e->getCode() == 190) {
+			unset($_SESSION['facebook_access_token']);
+			$helper = $fb->getRedirectLoginHelper();
+			$loginUrl = $helper->getLoginUrl('https://apps.facebook.com/APP_NAMESPACE/', $permissions);
+			echo "<script>window.top.location.href='".$loginUrl."'</script>";
+			exit;
+		}
+	} catch(Facebook\Exceptions\FacebookSDKException $e) {
+		// When validation fails or other local issues
+		echo 'Facebook SDK returned an error: ' . $e->getMessage();
+		exit;
+	}
+	
+	// posting on user timeline using publish_actins permission
+	try {
+		// message must come from the user-end
+		$data = ['message' => 'testing...'];
+		$request = $fb->post('/me/feed', $data);
+		$response = $request->getGraphEdge()->asArray;
 	} catch(Facebook\Exceptions\FacebookResponseException $e) {
 		// When Graph returns an error
 		echo 'Graph returned an error: ' . $e->getMessage();
@@ -78,13 +93,13 @@ if (isset($accessToken)) {
 		echo 'Facebook SDK returned an error: ' . $e->getMessage();
 		exit;
 	}
-
-	// printing $profile array on the screen which holds the basic info about user
-	print_r($profile);
-	// Now you can redirect to another page and use the access token from $_SESSION['facebook_access_token']
+	echo $response['id'];
+  	// Now you can redirect to another page and use the
+  	// access token from $_SESSION['facebook_access_token']
 } else {
-	// replace your website URL same as added in the developers.facebook.com/apps e.g. if you used http instead of https and you used non-www version or www version of your website then you must add the same here
-	$loginUrl = $helper->getLoginUrl("http://webcursos-d.uai.cl/local/facebook/app/newfile.php", $permissions);
-	echo '<a href="' . $loginUrl . '">Log in with Facebook!</a>';
+	$helper = $fb->getRedirectLoginHelper();
+	$loginUrl = $helper->getLoginUrl($url, $permissions);
+	echo "<script>window.top.location.href='".$loginUrl."'</script>";
 }
 echo $OUTPUT->footer();
+
