@@ -14,7 +14,7 @@ $config = array(
 
 
 $facebook = new Facebook\Facebook ($config);
-$helper = $fb->getCanvasHelper();
+$helper = $facebook->getCanvasHelper();
 $permissions = ['email', 'publish_actions']; // optional
 
 // URL for current page
@@ -49,25 +49,25 @@ try {
  }
 if (isset($accessToken)) {
 	if (isset($_SESSION['facebook_access_token'])) {
-		$fb->setDefaultAccessToken($_SESSION['facebook_access_token']);
+		$facebook->setDefaultAccessToken($_SESSION['facebook_access_token']);
 	} else {
 		$_SESSION['facebook_access_token'] = (string) $accessToken;
 	  	// OAuth 2.0 client handler
-		$oAuth2Client = $fb->getOAuth2Client();
+		$oAuth2Client = $facebook->getOAuth2Client();
 		// Exchanges a short-lived access token for a long-lived one
 		$longLivedAccessToken = $oAuth2Client->getLongLivedAccessToken($_SESSION['facebook_access_token']);
 		$_SESSION['facebook_access_token'] = (string) $longLivedAccessToken;
-		$fb->setDefaultAccessToken($_SESSION['facebook_access_token']);
+		$facebook->setDefaultAccessToken($_SESSION['facebook_access_token']);
 	}
 	
 	// validating the access token
 	try {
-		$request = $fb->get('/me');
+		$request = $facebook->get('/me');
 	} catch(Facebook\Exceptions\FacebookResponseException $e) {
 		// When Graph returns an error
 		if ($e->getCode() == 190) {
 			unset($_SESSION['facebook_access_token']);
-			$helper = $fb->getRedirectLoginHelper();
+			$helper = $facebook->getRedirectLoginHelper();
 			$loginUrl = $helper->getLoginUrl('https://apps.facebook.com/APP_NAMESPACE/', $permissions);
 			echo "<script>window.top.location.href='".$loginUrl."'</script>";
 			exit;
@@ -82,7 +82,7 @@ if (isset($accessToken)) {
 	try {
 		// message must come from the user-end
 		$data = ['message' => 'testing...'];
-		$request = $fb->post('/me/feed', $data);
+		$request = $facebook->post('/me/feed', $data);
 		$response = $request->getGraphEdge()->asArray;
 	} catch(Facebook\Exceptions\FacebookResponseException $e) {
 		// When Graph returns an error
@@ -97,7 +97,7 @@ if (isset($accessToken)) {
   	// Now you can redirect to another page and use the
   	// access token from $_SESSION['facebook_access_token']
 } else {
-	$helper = $fb->getRedirectLoginHelper();
+	$helper = $facebook->getRedirectLoginHelper();
 	$loginUrl = $helper->getLoginUrl($url, $permissions);
 	echo "<script>window.top.location.href='".$loginUrl."'</script>";
 }
