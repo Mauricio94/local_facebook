@@ -18,7 +18,7 @@ $helper = $facebook->getCanvasHelper();
 $permissions = ['email', 'publish_actions']; // optional
 
 // URL for current page
-$url = new moodle_url ( "/local/facebook/connect.php" );
+$url = new moodle_url ( "/local/facebook/app/newfile.php" );
 
 $context = context_system::instance ();
 
